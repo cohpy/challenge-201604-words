@@ -5,6 +5,8 @@ import os
 import string
 import collections
 import re
+import boto3
+import json
 
 def UrlFactory ( id ):
     try:
@@ -69,6 +71,13 @@ def Test ( results ):
             raise Exception (exception)
     return True
 
+def UploadToS3 ( id, wordFreqList ):
+    s3 = boto3.resource('s3')
+    bucket = 'admin-s3-uaa'
+    key = "%s.json" % ( id )
+    body = json.dumps(wordFreqList)
+    s3.Object(bucket, key).put(Body=body)
+
 def CleanUp ( localZip ):
     os.remove(localZip)
 
@@ -82,6 +91,7 @@ def lambda_handler ( event, context ):
     wordFreqList = WordListToFreqDict( wordList )
     wordFreqListSorted = SortFreqDict ( wordFreqList )
     Test ( wordFreqListSorted )
+    UploadToS3 (id, wordFreqList )
     print wordFreqListSorted
 
     CleanUp ( localZip )

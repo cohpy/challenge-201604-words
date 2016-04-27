@@ -15,9 +15,10 @@ in this implementation a 'word' is defined by the following conventions:
 
 Example:
 'One day, the day was a better one than that day.'
+
 day = 3
 one = 2
 
 >your definition of "word" and word counts must be tested,
 
-see doctest bit in Test function.  Test is rather strict, only a-z allowed.  This limits words to strict set of English words with no special chars.  This has no effect on 10 most used words in a book, but decreases accuracy for some lesser used words that contain special chars.
+see doctest bit in Test function.  Test is rather strict, only a-z allowed.  This limits words to strict set of English words with no special chars.  This has no effect on typical set of 10 most used words in a book, but decreases accuracy for some lesser used words that contain special chars.
