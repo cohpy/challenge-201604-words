@@ -1,6 +1,5 @@
 import re
 from collections import Counter
-from pprint import pprint
 
 
 from nltk.corpus import wordnet
@@ -11,9 +10,9 @@ with open(infile, 'rt') as fh:
     text = fh.read()
     upcase_text = text.upper()
 
-word_reg = re.compile("[A-Z]+'?")
+word_regex = re.compile("[A-Z]+'?")
 
-potential_matches = word_reg.findall(upcase_text)
+potential_matches = word_regex.findall(upcase_text)
 
 potential_match_count = Counter(potential_matches)
 
