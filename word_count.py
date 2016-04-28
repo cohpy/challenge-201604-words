@@ -14,7 +14,7 @@ with open(INFILE, 'rt') as fh, open(ENGLISH_WORDS, 'rt') as ed:
     english_dict = sorted(list(set([eng_word.lower().rstrip('\n') for eng_word in ed.readlines()])))
 
 # Compile word regex to use for finding word-like structures
-word_regex = re.compile("[a-z]+'?")
+word_regex = re.compile("[a-z]+\'?[a-z]+")
 
 # Find all matches of/for compiled regex
 potential_matches = word_regex.findall(downcase_text)
