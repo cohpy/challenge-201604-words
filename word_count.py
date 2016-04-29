@@ -12,10 +12,17 @@ def main():
 
     with open(INFILE, 'rt') as fh, open(ENGLISH_WORDS, 'rt') as ed:
         # Read the target text into a string translating all letters to lowercase
-        downcase_text = fh.read().lower()
+        english_dict = sorted(list(set([eng_word.lower().rstrip('\n') for eng_word in ed.readlines()])))
+        word_count = Counter()
+
+        for line in fh:
+            dcase_line = line.lower()
+            
+
+    '''
         # List comprehension which strips new lines from words, gets rid of duplicates (with set), and resorts them
         # alphabetically (for the sake of order)
-        english_dict = sorted(list(set([eng_word.lower().rstrip('\n') for eng_word in ed.readlines()])))
+
 
     # Compile word regex to use for finding word-like structures
     word_regex = re.compile("[a-z]+\'?[a-z]+")
@@ -41,6 +48,7 @@ def main():
     for word in word_gen:
         wc_format = "'{0!s}' * {1!s}"
         print(wc_format.format(word[0], word[1]))
+    '''
 
 if __name__ == '__main__':
     main()
