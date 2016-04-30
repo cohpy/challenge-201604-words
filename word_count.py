@@ -1,12 +1,19 @@
-import re
-from collections import Counter
-from io import StringIO
-import chardet
+# coding = utf-8
+# author = cwandrews
 
 
-TARGET_STRING = StringIO('This is my file.\nIt is alright I suppose.\nThis is really just a test.\nI hope it works')
+# TODO Extract sanitization to separate function which processes and normalizes text from:
+# text files
+# strings
+# urls *Maybe?
+
+# TODO consider building into a class?
+
+
+TARGET_STRING = 'This is my file.\nIt is alright I suppose.\nThis is really just a test.\nI hope it works'
 # Target text to be read (Frankenstein)
 TARGET_FILE = './pg83.txt'
+TARGET_FILE2 = './pg84.txt'
 TEST_TXT = './test.txt'
 DOES_NOT_EXIST = './fake.txt'
 
@@ -20,8 +27,12 @@ def read_in_file(filepath):
     assert exists(filepath) and isfile(filepath)
 
     with open(filepath, 'rt') as infile:
+        import re
+
         pre_post_re = re.compile("\n{10}")
         new_line_re = re.compile("[\n\r]")
+        white_space_re = re.compile("\s+")
+        special_chars_re = re.compile("[-\"\':;.?!,\(\)\d]+")
 
         read_text = infile.read()
 
@@ -32,58 +43,48 @@ def read_in_file(filepath):
 
         if new_line_re.search(working_text):
             core_text = new_line_re.split(working_text)
-            working_text = [line.strip() for line in core_text if line]
+            working_text = [w_line.strip() for w_line in core_text if w_line]
         else:
-            working_text = list(working_text)
+            working_text = list(working_text.strip())
 
-    assert isinstance(working_text, list)
-    return working_text
+        ews_processed_text = [white_space_re.sub(" ", w_line) for w_line in working_text]
+        sck_processed_text = [special_chars_re.sub('', w_line) for w_line in ews_processed_text]
+        processed_text = [w_line.lower() for w_line in sck_processed_text]
 
-x = read_in_file(TEST_TXT)
-print(type(x))
-print(x[:10])
-
-y = read_in_file(TARGET_FILE)
-print(type(y))
-print(y[:10])
+    assert isinstance(processed_text, list)
+    for line in processed_text:
+        yield line
 
 
-z = read_in_file(DOES_NOT_EXIST)
-print(type(z))
-print(z[:10])
+def char_counter(processed_text, num_words=10):
+    from types import GeneratorType
+    from collections import Counter
 
+    assert isinstance(processed_text, GeneratorType)
 
-def main(infile=TARGET_FILE, num_words=10):
+    with open(ENGLISH_WORDS, 'rt') as eng_dict:
+        english_dict = list(set([eng_word.lower().rstrip('\n') for eng_word in eng_dict.readlines()]))
 
-    with open(infile, 'rt') as fh, open(ENGLISH_WORDS, 'rt') as ed:
-        # Read the target text into a string translating all letters to lowercase
+    master_word_count = Counter()
 
-        pre_post_text = re.compile("\n{10}")
-        blank_line_regex = re.compile("^\n$")
-        white_space_regex = re.compile("\s+")
-        special_chars_regex = re.compile("[-\"\':;.?!,\(\)\d]+")
+    for w_line in processed_text:
+        master_word_count.update(Counter(w_line.split()))
 
-        fh = pre_post_text.split(fh.read())[1]
+    master_word_list = [word for word in master_word_count.most_common(num_words) if word[0] in english_dict]
+    master_word_list.sort(key=lambda wc: wc[1], reverse=True)
 
-        english_dict = sorted(list(set([eng_word.lower().rstrip('\n') for eng_word in ed.readlines()])))
-        word_count = Counter()
-
-        for line in enumerate(line.strip() for line in fh.split('\n') if not blank_line_regex.match(line)):
-            dcase_line = line[1].lower()
-            dcase_line = special_chars_regex.sub('', dcase_line)
-
-            word_count.update(Counter(white_space_regex.split(dcase_line)))
-
-    # Create a list from counter object
-    word_list = [word for word in word_count.most_common(num_words) if word[0] in english_dict]
-
-    # Sort list by word count in descending order
-    word_list.sort(key=lambda wc: wc[1], reverse=True)
-
-    # Use genexp to print a formatted string of a word and the number of occurrences of said word in the text
-    for word in word_list:
+    for word in master_word_list:
         wc_format = "'{0!s}' * {1!s}"
         print(wc_format.format(word[0], word[1]))
 
-if __name__ == '__main__':
+
+def main():
+
+    text_gen = read_in_file(TARGET_FILE)
+    char_counter(text_gen, 5)
+    print('\n\n\n')
+    text_gen2 = read_in_file(TARGET_FILE2)
+    char_counter(text_gen2, 10)
+
+if __name__ == "__main__":
     main()
