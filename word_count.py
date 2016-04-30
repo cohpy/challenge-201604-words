@@ -5,14 +5,14 @@ from collections import Counter
 # TODO Trim pre and post book information (Gutenberg project information for example) from text to be analyzed
 
 # Target text to be read (Frankenstein)
-INFILE = './pg84.txt'
+TARGET_FILE = './pg84.txt'
 # 230k+ words from the standard UNIX dict in a local text file ('/usr/share/dict/words')
 ENGLISH_WORDS = './english_words.txt'
 
 
-def main():
+def main(infile=TARGET_FILE, num_words=10):
 
-    with open(INFILE, 'rt') as fh, open(ENGLISH_WORDS, 'rt') as ed:
+    with open(infile, 'rt') as fh, open(ENGLISH_WORDS, 'rt') as ed:
         # Read the target text into a string translating all letters to lowercase
 
         pre_post_text = re.compile("\n{10}")
@@ -32,20 +32,16 @@ def main():
             word_count.update(Counter(white_space_regex.split(dcase_line)))
 
     # Create a list from counter object
-    word_list = [word for word in word_count.items() if word[0] in english_dict]
+    # word_list = word_count.items()[:num_words]
+    word_list = [word for word in word_count.most_common(num_words) if word[0] in english_dict]
 
     # Sort list by word count in descending order
     word_list.sort(key=lambda wc: wc[1], reverse=True)
 
-    # Create a generator expression from list of verified words because I can
-    word_gen = (word for word in word_list)
-
     # Use genexp to print a formatted string of a word and the number of occurrences of said word in the text
-    for word in word_gen:
+    for word in word_list:
         wc_format = "'{0!s}' * {1!s}"
         print(wc_format.format(word[0], word[1]))
-
-    print(word_list[:10])
 
 if __name__ == '__main__':
     main()
