@@ -1,16 +1,16 @@
 import re
 from collections import Counter
+from io import StringIO
 
 
-# TODO Trim pre and post book information (Gutenberg project information for example) from text to be analyzed
-
+TARGET_STRING = StringIO('This is my file.\nIt is alright I suppose.\nThis is really just a test.\nI hope it works')
 # Target text to be read (Frankenstein)
-TARGET_FILE = './pg84.txt'
+TARGET_FILE = './pg83.txt'
 # 230k+ words from the standard UNIX dict in a local text file ('/usr/share/dict/words')
 ENGLISH_WORDS = './english_words.txt'
 
 
-def main(infile=TARGET_FILE, num_words=10):
+def main(infile=TARGET_FILE, num_words=50):
 
     with open(infile, 'rt') as fh, open(ENGLISH_WORDS, 'rt') as ed:
         # Read the target text into a string translating all letters to lowercase
@@ -32,7 +32,6 @@ def main(infile=TARGET_FILE, num_words=10):
             word_count.update(Counter(white_space_regex.split(dcase_line)))
 
     # Create a list from counter object
-    # word_list = word_count.items()[:num_words]
     word_list = [word for word in word_count.most_common(num_words) if word[0] in english_dict]
 
     # Sort list by word count in descending order
