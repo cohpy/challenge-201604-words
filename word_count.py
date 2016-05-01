@@ -1,17 +1,16 @@
 # coding = utf-8
 # author = cwandrews
 
-
 # TODO Add docstrings
+# TODO Change read_in functions to generators?
 # TODO Add testing via pytest
 # strings
 # urls *Maybe?
 
-# TODO *Turn sanitize function into decorator/descriptor?*
 # TODO Consider building into a class?
 
 
-TARGET_STRING = 'This is my file.\nIt is alright I suppose.\nThis is really just a test.\nI hope it works'
+TARGET_STRING = 'This is? my file.\nIt is alright I suppose...\nThis is !really! just a test.\nI hope it, works'
 TARGET_STRING2 = 'This is just another string but longer and with no newlines to test the read_in_string method. is is.'
 # Target text to be read (Frankenstein)
 TARGET_FILE = './pg83.txt'
@@ -23,6 +22,37 @@ DOES_NOT_EXIST = './fake.txt'
 ENGLISH_WORDS = './english_words.txt'
 
 
+def sanitize(list_producing_func):
+    """
+    wraps function and performs additional processing (sanitzation) of text. Will strip white space, remove
+    special characters, downcase all letters, replace all white space w/single space.
+    :param list_producing_func:
+    :return: generator yielding sanitzed text
+    """
+    from functools import wraps
+
+    @wraps(list_producing_func)
+    def wrapper(*args, **kwargs):
+        import re
+
+        text_list = list_producing_func(*args, **kwargs)
+
+        white_space_re = re.compile("\s+")
+        special_chars_re = re.compile("[-\"\':;.?!,\(\)\d]+")
+
+        trimmed_text = [w_line.strip() for w_line in text_list if w_line]
+        extra_ws_processed_text = [white_space_re.sub(' ', w_line) for w_line in trimmed_text]
+        spec_char_killer_processed_text = [special_chars_re.sub('', w_line) for w_line in extra_ws_processed_text]
+        sanitized_text = [w_line.lower() for w_line in spec_char_killer_processed_text]
+
+        assert isinstance(sanitized_text, list)
+        for sanitized_line in sanitized_text:
+            yield sanitized_line
+
+    return wrapper
+
+
+@sanitize
 def read_in_string(string):
     import re
 
@@ -39,6 +69,7 @@ def read_in_string(string):
     return chunked_text
 
 
+@sanitize
 def read_in_file(filepath):
     from os.path import exists, isfile
 
@@ -66,24 +97,6 @@ def read_in_file(filepath):
     return chunked_text
 
 
-def sanitize(text_list):
-    import re
-
-    assert isinstance(text_list, list)
-
-    white_space_re = re.compile("\s+")
-    special_chars_re = re.compile("[-\"\':;.?!,\(\)\d]+")
-
-    trimmed_text = [w_line.strip() for w_line in text_list if w_line]
-    ews_processed_text = [white_space_re.sub(' ', w_line) for w_line in trimmed_text]
-    sck_processed_text = [special_chars_re.sub('', w_line) for w_line in ews_processed_text]
-    sanitized_text = [w_line.lower() for w_line in sck_processed_text]
-
-    assert isinstance(sanitized_text, list)
-    for sanitized_line in sanitized_text:
-        yield sanitized_line
-
-
 def char_counter(sanitized_text_gen, num_words=10):
     from types import GeneratorType
     from collections import Counter
@@ -108,23 +121,29 @@ def char_counter(sanitized_text_gen, num_words=10):
 
 def main():
 
-    text_gen = sanitize(read_in_file(TARGET_FILE))
+    text_gen = read_in_file(TARGET_FILE)
     char_counter(text_gen, 5)
 
     print('\n')
 
-    text_gen2 = sanitize(read_in_file(TARGET_FILE2))
+    text_gen2 = read_in_file(TARGET_FILE2)
     char_counter(text_gen2, 10)
 
     print('\n')
 
-    text_gen3 = sanitize(read_in_string(TARGET_STRING))
+    text_gen3 = read_in_string(TARGET_STRING)
     char_counter(text_gen3, 3)
 
     print('\n')
 
-    text_gen4 = sanitize(read_in_string(TARGET_STRING2))
+    text_gen4 = read_in_string(TARGET_STRING2)
     char_counter(text_gen4, 30)
+
+    print('\n')
+
+    unwrapped = read_in_string.__wrapped__
+    print(unwrapped(TARGET_STRING))
+    print([string for string in read_in_string(TARGET_STRING)])
 
 if __name__ == "__main__":
     main()
