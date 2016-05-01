@@ -4,30 +4,29 @@
 # TODO Add docstrings
 # TODO Change read_in functions to generators?
 # TODO Add testing via pytest
-# strings
 # urls *Maybe?
-
-# TODO Consider building into a class?
 
 
 TARGET_STRING = 'This is? my file.\nIt is alright I suppose...\nThis is !really! just a test.\nI hope it, works'
 TARGET_STRING2 = 'This is just another string but longer and with no newlines to test the read_in_string method. is is.'
 # Target text to be read (Frankenstein)
-TARGET_FILE = './pg83.txt'
-TARGET_FILE2 = './pg84.txt'
-TEST_TXT = './test.txt'
-DOES_NOT_EXIST = './fake.txt'
+TARGET_FILE = './static_files/pg83.txt'
+TARGET_FILE2 = './static_files/pg84.txt'
+TEST_TXT = './static_files/test.txt'
+DOES_NOT_EXIST = './static_files/fake.txt'
 
 # 230k+ words from the standard UNIX dict in a local text file ('/usr/share/dict/words')
-ENGLISH_WORDS = './english_words.txt'
+ENGLISH_WORDS = './static_files/english_words.txt'
 
 
 class WordCounter:
-    """Read text from string or text file, counts words, and returns sorted list of tuples with the n most common words
+    """
+    Read text from string or text file, counts words, and returns sorted list of tuples with the n most common words
     and their respective counts.
     """
 
-    def __char_counter(self, sanitized_text_gen, num_words=10):
+    @staticmethod
+    def _char_counter(sanitized_text_gen, num_words=10):
         from types import GeneratorType
         from collections import Counter
 
@@ -48,12 +47,12 @@ class WordCounter:
             wc_format = "'{0!s}' * {1!s}"
             print(wc_format.format(word[0], word[1]))
 
-    def __sanitize(self, string_list):
+    @staticmethod
+    def __sanitize(string_list):
         """
-        wraps function and performs additional processing (sanitzation) of text. Will strip white space, remove
-        special characters, downcase all letters, replace all white space w/single space.
-        :param string_list:
-        :return: generator yielding sanitzed text
+        Performs additional processing (sanitzation) of text. Will strip white space from start and end of string,
+        remove special characters, downcase all letters, replace any white space w/single space. Private method
+        utilized by class methods.
         """
         import re
 
@@ -84,7 +83,7 @@ class WordCounter:
             chunked_text = [string]
 
         assert isinstance(chunked_text, list)
-        return self.__char_counter(self.__sanitize(chunked_text), length)
+        return self._char_counter(self.__sanitize(chunked_text), length)
 
     def read_in_file(self, filepath, length):
         from os.path import exists, isfile
@@ -110,21 +109,30 @@ class WordCounter:
                 chunked_text = [working_text]
 
         assert isinstance(chunked_text, list)
-        return self.__char_counter(self.__sanitize(chunked_text), length)
+        return self._char_counter(self.__sanitize(chunked_text), length)
 
 
-def main():
+class LetterCounter(WordCounter):
 
-    word_count = WordCounter()
+    @staticmethod
+    def _char_counter(sanitized_text_gen, num_letters=10):
+        from types import GeneratorType
+        from collections import Counter
+        import re
 
-    word_count.read_in_file(TARGET_FILE, 15)
-    print('\n')
-    word_count.read_in_file(TARGET_FILE2, 15)
-    print('\n')
-    word_count.read_in_string(TARGET_STRING, 5)
-    print('\n')
-    word_count.read_in_string(TARGET_STRING2, 5)
-    print('\n')
+        assert isinstance(sanitized_text_gen, GeneratorType)
 
-if __name__ == "__main__":
-    main()
+        english_letters = re.compile("[a-z]")
+
+        master_letter_count = Counter()
+
+        for w_line in sanitized_text_gen:
+            ns_w_line = list(''.join(w_line))
+            master_letter_count.update(Counter(ns_w_line))
+
+        master_letter_list = [letter for letter in master_letter_count.most_common(
+            num_letters) if english_letters.match(letter[0])]
+
+        master_letter_list.sort(key=lambda lc: lc[1], reverse=True)
+
+        return master_letter_list[:num_letters]
