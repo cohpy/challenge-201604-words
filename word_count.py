@@ -7,10 +7,12 @@
 # strings
 # urls *Maybe?
 
-# TODO consider building into a class?
+# TODO *Turn sanitize function into decorator/descriptor?*
+# TODO Consider building into a class?
 
 
 TARGET_STRING = 'This is my file.\nIt is alright I suppose.\nThis is really just a test.\nI hope it works'
+TARGET_STRING2 = 'This is just another string but longer and with no newlines to test the read_in_string method. is is.'
 # Target text to be read (Frankenstein)
 TARGET_FILE = './pg83.txt'
 TARGET_FILE2 = './pg84.txt'
@@ -22,7 +24,19 @@ ENGLISH_WORDS = './english_words.txt'
 
 
 def read_in_string(string):
-    pass
+    import re
+
+    assert isinstance(string, str)
+
+    new_line_re = re.compile("[\n\r]")
+
+    if new_line_re.search(string):
+        chunked_text = new_line_re.split(string)
+    else:
+        chunked_text = [string]
+
+    assert isinstance(chunked_text, list)
+    return chunked_text
 
 
 def read_in_file(filepath):
@@ -33,24 +47,23 @@ def read_in_file(filepath):
     with open(filepath, 'rt') as infile:
         import re
 
-        pre_post_re = re.compile("\n{10}")
+        gberg_split_re = re.compile("\n{10}")
         new_line_re = re.compile("[\n\r]")
 
         read_text = infile.read()
 
-        if ("GUTENBERG" in read_text) and pre_post_re.search(read_text):
-            working_text = pre_post_re.split(read_text)[1]
+        if ("GUTENBERG" in read_text) and gberg_split_re.search(read_text):
+            working_text = gberg_split_re.split(read_text)[1]
         else:
             working_text = read_text
 
         if new_line_re.search(working_text):
-            core_text = new_line_re.split(working_text)
-            working_text = [w_line.strip() for w_line in core_text if w_line]
+            chunked_text = new_line_re.split(working_text)
         else:
-            working_text = list(working_text.strip())
+            chunked_text = [working_text]
 
-    assert isinstance(working_text, list)
-    return working_text
+    assert isinstance(chunked_text, list)
+    return chunked_text
 
 
 def sanitize(text_list):
@@ -61,7 +74,8 @@ def sanitize(text_list):
     white_space_re = re.compile("\s+")
     special_chars_re = re.compile("[-\"\':;.?!,\(\)\d]+")
 
-    ews_processed_text = [white_space_re.sub(' ', w_line) for w_line in text_list]
+    trimmed_text = [w_line.strip() for w_line in text_list if w_line]
+    ews_processed_text = [white_space_re.sub(' ', w_line) for w_line in trimmed_text]
     sck_processed_text = [special_chars_re.sub('', w_line) for w_line in ews_processed_text]
     sanitized_text = [w_line.lower() for w_line in sck_processed_text]
 
@@ -96,9 +110,21 @@ def main():
 
     text_gen = sanitize(read_in_file(TARGET_FILE))
     char_counter(text_gen, 5)
+
     print('\n')
+
     text_gen2 = sanitize(read_in_file(TARGET_FILE2))
     char_counter(text_gen2, 10)
+
+    print('\n')
+
+    text_gen3 = sanitize(read_in_string(TARGET_STRING))
+    char_counter(text_gen3, 3)
+
+    print('\n')
+
+    text_gen4 = sanitize(read_in_string(TARGET_STRING2))
+    char_counter(text_gen4, 30)
 
 if __name__ == "__main__":
     main()
