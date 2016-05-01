@@ -47,7 +47,7 @@ def read_in_file(filepath):
         else:
             working_text = list(working_text.strip())
 
-        ews_processed_text = [white_space_re.sub(" ", w_line) for w_line in working_text]
+        ews_processed_text = [white_space_re.sub(' ', w_line) for w_line in working_text]
         sck_processed_text = [special_chars_re.sub('', w_line) for w_line in ews_processed_text]
         processed_text = [w_line.lower() for w_line in sck_processed_text]
 
@@ -82,7 +82,7 @@ def main():
 
     text_gen = read_in_file(TARGET_FILE)
     char_counter(text_gen, 5)
-    print('\n\n\n')
+    print('\n')
     text_gen2 = read_in_file(TARGET_FILE2)
     char_counter(text_gen2, 10)
 
