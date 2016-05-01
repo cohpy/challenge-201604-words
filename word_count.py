@@ -2,8 +2,8 @@
 # author = cwandrews
 
 
-# TODO Extract sanitization to separate function which processes and normalizes text from:
-# text files
+# TODO Add docstrings
+# TODO Add testing via pytest
 # strings
 # urls *Maybe?
 
@@ -21,6 +21,10 @@ DOES_NOT_EXIST = './fake.txt'
 ENGLISH_WORDS = './english_words.txt'
 
 
+def read_in_string(string):
+    pass
+
+
 def read_in_file(filepath):
     from os.path import exists, isfile
 
@@ -31,8 +35,6 @@ def read_in_file(filepath):
 
         pre_post_re = re.compile("\n{10}")
         new_line_re = re.compile("[\n\r]")
-        white_space_re = re.compile("\s+")
-        special_chars_re = re.compile("[-\"\':;.?!,\(\)\d]+")
 
         read_text = infile.read()
 
@@ -47,27 +49,39 @@ def read_in_file(filepath):
         else:
             working_text = list(working_text.strip())
 
-        ews_processed_text = [white_space_re.sub(' ', w_line) for w_line in working_text]
-        sck_processed_text = [special_chars_re.sub('', w_line) for w_line in ews_processed_text]
-        processed_text = [w_line.lower() for w_line in sck_processed_text]
-
-    assert isinstance(processed_text, list)
-    for line in processed_text:
-        yield line
+    assert isinstance(working_text, list)
+    return working_text
 
 
-def char_counter(processed_text, num_words=10):
+def sanitize(text_list):
+    import re
+
+    assert isinstance(text_list, list)
+
+    white_space_re = re.compile("\s+")
+    special_chars_re = re.compile("[-\"\':;.?!,\(\)\d]+")
+
+    ews_processed_text = [white_space_re.sub(' ', w_line) for w_line in text_list]
+    sck_processed_text = [special_chars_re.sub('', w_line) for w_line in ews_processed_text]
+    sanitized_text = [w_line.lower() for w_line in sck_processed_text]
+
+    assert isinstance(sanitized_text, list)
+    for sanitized_line in sanitized_text:
+        yield sanitized_line
+
+
+def char_counter(sanitized_text_gen, num_words=10):
     from types import GeneratorType
     from collections import Counter
 
-    assert isinstance(processed_text, GeneratorType)
+    assert isinstance(sanitized_text_gen, GeneratorType)
 
     with open(ENGLISH_WORDS, 'rt') as eng_dict:
         english_dict = list(set([eng_word.lower().rstrip('\n') for eng_word in eng_dict.readlines()]))
 
     master_word_count = Counter()
 
-    for w_line in processed_text:
+    for w_line in sanitized_text_gen:
         master_word_count.update(Counter(w_line.split()))
 
     master_word_list = [word for word in master_word_count.most_common(num_words) if word[0] in english_dict]
@@ -80,10 +94,10 @@ def char_counter(processed_text, num_words=10):
 
 def main():
 
-    text_gen = read_in_file(TARGET_FILE)
+    text_gen = sanitize(read_in_file(TARGET_FILE))
     char_counter(text_gen, 5)
     print('\n')
-    text_gen2 = read_in_file(TARGET_FILE2)
+    text_gen2 = sanitize(read_in_file(TARGET_FILE2))
     char_counter(text_gen2, 10)
 
 if __name__ == "__main__":
