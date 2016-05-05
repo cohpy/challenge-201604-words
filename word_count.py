@@ -1,10 +1,7 @@
 # coding = utf-8
 # author = cwandrews
 
-# TODO Add docstrings
-# TODO Change read_in functions to generators?
 # TODO Add testing via pytest
-# urls *Maybe?
 
 
 TARGET_STRING = 'This is? my file.\nIt is alright I suppose...\nThis is !really! just a test.\nI hope it, works'
@@ -15,9 +12,6 @@ TARGET_FILE2 = './static_files/pg84.txt'
 TEST_TXT = './static_files/test.txt'
 DOES_NOT_EXIST = './static_files/fake.txt'
 
-# 230k+ words from the standard UNIX dict in a local text file ('/usr/share/dict/words')
-ENGLISH_WORDS = './static_files/english_words.txt'
-
 
 class WordCounter:
     """
@@ -25,14 +19,16 @@ class WordCounter:
     and their respective counts.
     """
 
+    from types import GeneratorType
+
     @staticmethod
-    def _char_counter(sanitized_text_gen, num_words=10):
-        from types import GeneratorType
+    def _char_counter(sanitized_text_gen: GeneratorType, num_words: int=10):
         from collections import Counter
 
+        # 230k+ words from the standard UNIX dict in a local text file ('/usr/share/dict/words')
+        ENGLISH_WORDS = './static_files/english_words.txt'
+
         assert isinstance(sanitized_text_gen, GeneratorType)
-        if num_words in (0, False):
-            num_words = False
 
         with open(ENGLISH_WORDS, 'rt') as eng_dict:
             english_dict = list(set([eng_word.lower().rstrip('\n') for eng_word in eng_dict.readlines()]))
@@ -42,7 +38,7 @@ class WordCounter:
         for w_line in sanitized_text_gen:
             master_word_count.update(Counter(w_line.split()))
 
-        if num_words:
+        if num_words in (0, False):
             master_word_list = [word for word in master_word_count.most_common(num_words) if word[0] in english_dict]
             master_word_list.sort(key=lambda wc: wc[1], reverse=True)
             return master_word_list[:num_words]
@@ -52,12 +48,13 @@ class WordCounter:
             return master_word_list
 
     @staticmethod
-    def __sanitize(string_list):
+    def __sanitize(string_list: list):
         """
         Performs additional processing (sanitzation) of text. Will strip white space from start and end of string,
         remove special characters, downcase all letters, replace any white space w/single space. Private method
         utilized by class methods.
         """
+
         import re
 
         assert isinstance(string_list, list)
@@ -74,7 +71,11 @@ class WordCounter:
         for sanitized_line in sanitized_text:
             yield sanitized_line
 
-    def read_in_string(self, string, length):
+    def read_in_string(self, string: str, length: int):
+        """
+        return a sorted list of the #length# most common words and their counts in a tuple.
+        """
+
         import re
 
         assert isinstance(string, str)
@@ -89,7 +90,11 @@ class WordCounter:
         assert isinstance(chunked_text, list)
         return self._char_counter(self.__sanitize(chunked_text), length)
 
-    def read_in_file(self, filepath, length):
+    def read_in_file(self, filepath: str, length: int):
+        """
+        return sorted list of the #length# most common words and their counts in a tuple.
+        """
+
         from os.path import exists, isfile
 
         assert exists(filepath) and isfile(filepath)
@@ -117,17 +122,19 @@ class WordCounter:
 
 
 class LetterCounter(WordCounter):
+    """
+    Letter counter object which counts letters instead of words like it's parent class wherein the only difference is
+    the _char_counter method which has been overidden.
+    """
+
+    from types import GeneratorType
 
     @staticmethod
-    def _char_counter(sanitized_text_gen, num_letters=10):
-        from types import GeneratorType
+    def _char_counter(sanitized_text_gen: GeneratorType, num_letters: int=10):
         from collections import Counter
         import re
 
         assert isinstance(sanitized_text_gen, GeneratorType)
-
-        if num_letters in (0, False):
-            num_letters = False
 
         english_letters = re.compile("[a-z]")
 
@@ -137,7 +144,7 @@ class LetterCounter(WordCounter):
             ns_w_line = list(''.join(w_line))
             master_letter_count.update(Counter(ns_w_line))
 
-        if num_letters:
+        if num_letters in (0, False):
             master_letter_list = [letter for letter in master_letter_count.most_common(
                 num_letters) if english_letters.match(letter[0])]
             master_letter_list.sort(key=lambda lc: lc[1], reverse=True)
