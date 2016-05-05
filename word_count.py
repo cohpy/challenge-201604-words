@@ -31,6 +31,8 @@ class WordCounter:
         from collections import Counter
 
         assert isinstance(sanitized_text_gen, GeneratorType)
+        if num_words in (0, False):
+            num_words = False
 
         with open(ENGLISH_WORDS, 'rt') as eng_dict:
             english_dict = list(set([eng_word.lower().rstrip('\n') for eng_word in eng_dict.readlines()]))
@@ -40,12 +42,14 @@ class WordCounter:
         for w_line in sanitized_text_gen:
             master_word_count.update(Counter(w_line.split()))
 
-        master_word_list = [word for word in master_word_count.most_common(num_words) if word[0] in english_dict]
-        master_word_list.sort(key=lambda wc: wc[1], reverse=True)
-
-        for word in master_word_list:
-            wc_format = "'{0!s}' * {1!s}"
-            print(wc_format.format(word[0], word[1]))
+        if num_words:
+            master_word_list = [word for word in master_word_count.most_common(num_words) if word[0] in english_dict]
+            master_word_list.sort(key=lambda wc: wc[1], reverse=True)
+            return master_word_list[:num_words]
+        else:
+            master_word_list = [word for word in master_word_count.items() if word[0] in english_dict]
+            master_word_list.sort(key=lambda wc: wc[1], reverse=True)
+            return master_word_list
 
     @staticmethod
     def __sanitize(string_list):
@@ -122,6 +126,9 @@ class LetterCounter(WordCounter):
 
         assert isinstance(sanitized_text_gen, GeneratorType)
 
+        if num_letters in (0, False):
+            num_letters = False
+
         english_letters = re.compile("[a-z]")
 
         master_letter_count = Counter()
@@ -130,9 +137,12 @@ class LetterCounter(WordCounter):
             ns_w_line = list(''.join(w_line))
             master_letter_count.update(Counter(ns_w_line))
 
-        master_letter_list = [letter for letter in master_letter_count.most_common(
-            num_letters) if english_letters.match(letter[0])]
-
-        master_letter_list.sort(key=lambda lc: lc[1], reverse=True)
-
-        return master_letter_list[:num_letters]
+        if num_letters:
+            master_letter_list = [letter for letter in master_letter_count.most_common(
+                num_letters) if english_letters.match(letter[0])]
+            master_letter_list.sort(key=lambda lc: lc[1], reverse=True)
+            return master_letter_list[:num_letters]
+        else:
+            master_letter_list = [letter for letter in master_letter_count.items() if english_letters.match(letter[0])]
+            master_letter_list.sort(key=lambda lc: lc[1], reverse=True)
+            return master_letter_list
