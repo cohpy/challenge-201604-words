@@ -3,23 +3,13 @@
 
 import pytest
 
-
-TARGET_FILE2 = './static_files/pg84.txt'
-
-TARGET_STRING = 'This is? my file.\nIt is alright I suppose...\nThis is !really! just a test.\nI hope it, works'
-TARGET_STRING2 = ('This is just another string but longer and with no newlines to test the read_in_string method. '
-                  'is is.')
+TARGET_FILE = './static_files/pg83.txt'
 
 
-@pytest.fixture(scope="function", params=[10, 15, 35])
-def test_create_wordcounter_with_read_infile(param):
+@pytest.mark.parametrize("num_words", (range(1, 25)))
+def test_wordcounter_len(num_words):
     from word_count import WordCounter
 
-    TARGET_FILE = './static_files/pg83.txt'
-    word_count = WordCounter().read_in_file(TARGET_FILE, param)
-    return word_count
-
-
-@pytest.mark.usefixtures(test_create_wordcounter_with_read_infile)
-def test_wordcounter(num_words):
-    assert len(test_create_wordcounter_with_read_infile(num_words)) == num_words
+    word_count = WordCounter().read_in_file(filepath=TARGET_FILE, length=num_words)
+    print(len(word_count))
+    assert len(word_count) == num_words
