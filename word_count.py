@@ -44,8 +44,11 @@ class WordCounter:
             master_word_list.sort(key=lambda wc: wc[1], reverse=True)
             return master_word_list
         else:
-            master_word_list = [word for word in master_word_count.most_common(num_words) if word[0] in english_dict]
-            master_word_list.sort(key=lambda wc: wc[1], reverse=True)
+            master_word_list = []
+            most_common_gen = (word for word in master_word_count.most_common() if word[0] in english_dict)
+            while len(master_word_list) < num_words:
+                master_word_list.append(next(most_common_gen))
+            master_word_list.sort(key=lambda counter_obj: counter_obj[1], reverse=True)
             return master_word_list[:num_words]
 
     @staticmethod
@@ -149,9 +152,12 @@ class LetterCounter(WordCounter):
         if num_letters in (0, False):
             master_letter_list = [letter for letter in master_letter_count.items() if english_letters.match(letter[0])]
             master_letter_list.sort(key=lambda lc: lc[1], reverse=True)
-            return master_letter_list[:num_letters]
-        else:
-            master_letter_list = [letter for letter in master_letter_count.most_common(
-                num_letters) if english_letters.match(letter[0])]
-            master_letter_list.sort(key=lambda lc: lc[1], reverse=True)
             return master_letter_list
+        else:
+            master_letter_list = list()
+            common_letters_gen = (letter for letter in master_letter_count.most_common() if english_letters.match(
+                letter[0]))
+            while len(master_letter_list) < num_letters:
+                master_letter_list.append(next(common_letters_gen))
+            master_letter_list.sort(key=lambda counter_obj: counter_obj[1], reverse=True)
+            return master_letter_list[:num_letters]
