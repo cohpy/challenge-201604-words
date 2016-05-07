@@ -3,6 +3,7 @@
 
 import pytest
 
+
 TARGET_STRING = 'This is? my file.\nIt is alright I suppose...\nThis is !really! just a test.\nI hope it, works'
 TARGET_STRING2 = 'This is just another string but longer and with no newlines to test the read_in_string method. is is.'
 # Target text to be read (Frankenstein)
