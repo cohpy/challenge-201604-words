@@ -13,7 +13,7 @@ TEST_TXT = './static_files/test.txt'
 DOES_NOT_EXIST = './static_files/fake.txt'
 
 
-@pytest.mark.parametrize("num_words", (range(1, 21)))
+@pytest.mark.parametrize("num_words", (15, 25, 35))
 def test_wordcounter_len(num_words):
     from word_count import WordCounter
 
@@ -22,7 +22,7 @@ def test_wordcounter_len(num_words):
     assert len(word_count) == num_words
 
 
-@pytest.mark.parametrize("num_letters", (range(1, 27)))
+@pytest.mark.parametrize("num_letters", (1, 26))
 def test_lettercounter_len(num_letters):
     from word_count import LetterCounter
 
