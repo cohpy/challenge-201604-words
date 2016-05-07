@@ -39,7 +39,7 @@ class WordCounter:
         for w_line in sanitized_text_gen:
             master_word_count.update(Counter(w_line.split()))
 
-        if num_words in (0, False):
+        if not num_words:
             master_word_list = [word for word in master_word_count.items() if word[0] in english_dict]
             master_word_list.sort(key=lambda wc: wc[1], reverse=True)
             return master_word_list
@@ -149,7 +149,7 @@ class LetterCounter(WordCounter):
             ns_w_line = list(''.join(w_line))
             master_letter_count.update(Counter(ns_w_line))
 
-        if num_letters in (0, False):
+        if not num_letters:
             master_letter_list = [letter for letter in master_letter_count.items() if english_letters.match(letter[0])]
             master_letter_list.sort(key=lambda lc: lc[1], reverse=True)
             return master_letter_list
