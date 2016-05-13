@@ -1,5 +1,5 @@
 # coding = utf-8
-# author = cwandrews
+# __author__ = cwandrews
 
 import pytest
 
