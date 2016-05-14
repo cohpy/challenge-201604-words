@@ -15,6 +15,18 @@ DOES_NOT_EXIST = './static/fake.txt'
 
 class TestWordCounter:
 
+    def test_char_counter_takes_str_gen_only(self):
+        from word_count import WordCounter
+
+        not_str_gens = tuple(), list(), dict(), set(), int(), str(), bytes(), float(), complex()
+        str_genexp = (word for word in 'This is just for a test..')
+
+        for not_gen in not_str_gens:
+            with pytest.raises(AssertionError):
+                WordCounter._char_counter(not_gen)
+
+        assert WordCounter._char_counter(str_genexp)
+
     def test_diff_n_words(self):
         from word_count import WordCounter
 
