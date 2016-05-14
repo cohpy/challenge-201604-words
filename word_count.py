@@ -16,11 +16,11 @@ class WordCounter:
         from types import GeneratorType
 
         # 230k+ words from the standard UNIX dict in a local text file ('/usr/share/dict/words')
-        ENGLISH_WORDS = './static/english_words.txt'
+        english_words = './static/english_words.txt'
 
         assert isinstance(sanitized_text_gen, GeneratorType)
 
-        with open(ENGLISH_WORDS, 'rt') as eng_dict:
+        with open(english_words, 'rt') as eng_dict:
             english_dict = list(set([eng_word.lower().rstrip('\n') for eng_word in eng_dict.readlines()]))
 
         master_word_count = Counter()
