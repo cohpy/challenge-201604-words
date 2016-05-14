@@ -13,25 +13,31 @@ TEST_TXT = './static_files/test.txt'
 DOES_NOT_EXIST = './static_files/fake.txt'
 
 
-@pytest.mark.parametrize("num_words", (15, 25, 35))
-def test_wordcounter_len(num_words):
-    from word_count import WordCounter
+class TestWordCounter:
 
-    word_count = WordCounter().read_in_file(filepath=TARGET_FILE, length=num_words)
-    print(len(word_count))
-    assert len(word_count) == num_words
+    def test_diff_n_words(self):
+        from word_count import WordCounter
 
+        n_words_tup = 15, 25, 35
 
-@pytest.mark.parametrize("num_letters", (1, 26))
-def test_lettercounter_len(num_letters):
-    from word_count import LetterCounter
-
-    letter_count = LetterCounter().read_in_file(filepath=TARGET_FILE, length=num_letters)
-    assert len(letter_count) == num_letters
+        for n_words in n_words_tup:
+            word_count = WordCounter().read_in_file(filepath=TARGET_FILE, length=n_words)
+            assert len(word_count) == n_words
 
 
-def test_lettercounter_letters_only(num_letters=27):
-    from word_count import LetterCounter
+class TestLetterCounter:
 
-    with pytest.raises(StopIteration):
-        LetterCounter().read_in_file(filepath=TARGET_FILE, length=num_letters)
+    def test_diff_n_letters(self):
+        from word_count import LetterCounter
+        n_letters_tup = 1, 26
+
+        for n_letters in n_letters_tup:
+            letter_count = LetterCounter().read_in_file(filepath=TARGET_FILE, length=n_letters)
+            assert len(letter_count) == n_letters
+
+    def test_counts_letters_only(self):
+        from word_count import LetterCounter
+        n_letters = 27
+
+        with pytest.raises(StopIteration):
+            LetterCounter().read_in_file(filepath=TARGET_FILE, length=n_letters)
