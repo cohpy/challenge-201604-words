@@ -1,7 +1,5 @@
 # coding = utf-8
-# author = cwandrews
-
-# TODO Add testing via pytest
+# __author__ = cwandrews
 
 
 class WordCounter:
@@ -18,7 +16,7 @@ class WordCounter:
         from types import GeneratorType
 
         # 230k+ words from the standard UNIX dict in a local text file ('/usr/share/dict/words')
-        ENGLISH_WORDS = './static_files/english_words.txt'
+        ENGLISH_WORDS = './static/english_words.txt'
 
         assert isinstance(sanitized_text_gen, GeneratorType)
 
