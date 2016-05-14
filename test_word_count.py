@@ -27,11 +27,12 @@ class TestWordCounter:
 
         assert WordCounter._char_counter(str_genexp)
 
-    def test_char_counter_returns_list_of_tuples_of_strings_and_counts(self):
+    def test_char_counter_returns_list_of_tuples_of_strings_and_counts_in_desc_order(self):
         from word_count import WordCounter
 
         str_genexp = (word for word in 'This is just for a test..')
         counted_list = WordCounter._char_counter(str_genexp)
+        counts_only = [obj[1] for obj in counted_list]
 
         assert isinstance(counted_list, list)
 
@@ -39,6 +40,9 @@ class TestWordCounter:
             assert isinstance(obj, tuple)
             assert isinstance(obj[0], str)
             assert isinstance(obj[1], int)
+
+        for i in range(len(counts_only) - 1):
+            assert counts_only[i] >= counts_only[i + 1]
 
     def test_char_counter_returns_no_non_english_words(self):
         from word_count import WordCounter
