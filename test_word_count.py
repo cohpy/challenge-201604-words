@@ -7,10 +7,10 @@ import pytest
 TARGET_STRING = 'This is? my file.\nIt is alright I suppose...\nThis is !really! just a test.\nI hope it, works'
 TARGET_STRING2 = 'This is just another string but longer and with no newlines to test the read_in_string method. is is.'
 # Target text to be read (Frankenstein)
-TARGET_FILE = './static_files/pg83.txt'
-TARGET_FILE2 = './static_files/pg84.txt'
-TEST_TXT = './static_files/test.txt'
-DOES_NOT_EXIST = './static_files/fake.txt'
+TARGET_FILE = './static/pg83.txt'
+TARGET_FILE2 = './static/pg84.txt'
+TEST_TXT = './static/test.txt'
+DOES_NOT_EXIST = './static/fake.txt'
 
 
 class TestWordCounter:
