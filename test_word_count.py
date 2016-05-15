@@ -16,7 +16,7 @@ from word_count import WordCounter
 
 
 @pytest.fixture("class")
-def words_generator():
+def generator_words_good():
     import re
 
     return (word for word in re.split("\s+", 'This is just for a test.. to see how well...'))
@@ -30,23 +30,22 @@ def generator_words_dirty():
         "\s+", 'This is just| test.. dfadfskj see ?!%G1 is ?!%G1 will dfadfskj'))
 
 
-@pytest.mark.usefixtures("words_generator", "generator_words_dirty")
+@pytest.mark.usefixtures("generator_words_good", "generator_words_dirty")
 class TestWordCounter:
 
     def test_char_counter_takes_str_gen_only(self):
 
-        words_generator()
         not_str_gens = tuple(), list(), dict(), set(), int(), str(), bytes(), float(), complex()
 
         for not_gen in not_str_gens:
             with pytest.raises(AssertionError):
                 WordCounter._char_counter(not_gen, num_words=5)
 
-        assert WordCounter._char_counter(words_generator(), num_words=5)
+        assert WordCounter._char_counter(generator_words_good(), num_words=5)
 
     def test_char_counter_returns_list_of_tuples_of_strings_and_counts_in_desc_order(self):
 
-        counted_list = WordCounter._char_counter(words_generator(), num_words=5)
+        counted_list = WordCounter._char_counter(generator_words_good(), num_words=5)
         counts_only = [obj[1] for obj in counted_list]
 
         assert isinstance(counted_list, list)
