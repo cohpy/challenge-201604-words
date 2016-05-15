@@ -12,26 +12,41 @@ TARGET_FILE2 = './static/pg84.txt'
 TEST_TXT = './static/test.txt'
 DOES_NOT_EXIST = './static/fake.txt'
 
+from word_count import WordCounter
 
+
+@pytest.fixture("class")
+def words_generator():
+    import re
+
+    return (word for word in re.split("\s+", 'This is just for a test.. to see how well...'))
+
+
+@pytest.fixture("class")
+def generator_words_dirty():
+    import re
+
+    return (word for word in re.split(
+        "\s+", 'This is just| test.. dfadfskj see ?!%G1 is ?!%G1 will dfadfskj'))
+
+
+@pytest.mark.usefixtures("words_generator", "generator_words_dirty")
 class TestWordCounter:
 
     def test_char_counter_takes_str_gen_only(self):
-        from word_count import WordCounter
 
-        str_genexp = (word for word in 'This is just for a test..')
+        words_generator()
         not_str_gens = tuple(), list(), dict(), set(), int(), str(), bytes(), float(), complex()
 
         for not_gen in not_str_gens:
             with pytest.raises(AssertionError):
-                WordCounter._char_counter(not_gen)
+                WordCounter._char_counter(not_gen, num_words=5)
 
-        assert WordCounter._char_counter(str_genexp)
+        assert WordCounter._char_counter(words_generator(), num_words=5)
 
     def test_char_counter_returns_list_of_tuples_of_strings_and_counts_in_desc_order(self):
-        from word_count import WordCounter
 
-        str_genexp = (word for word in 'This is just for a test..')
-        counted_list = WordCounter._char_counter(str_genexp)
+        counted_list = WordCounter._char_counter(words_generator(), num_words=5)
         counts_only = [obj[1] for obj in counted_list]
 
         assert isinstance(counted_list, list)
@@ -45,14 +60,12 @@ class TestWordCounter:
             assert counts_only[i] >= counts_only[i + 1]
 
     def test_char_counter_returns_no_non_english_words(self):
-        from word_count import WordCounter
 
         english_words = './static/english_words.txt'
         with open(english_words, 'rt') as eng_dict:
             english_dict = list(set([eng_word.lower().rstrip('\n') for eng_word in eng_dict.readlines()]))
 
-        dirty_str_genexp = (word for word in '|This is just dfadfskj for a ?!%G1 test..')
-        clean_counted_list = WordCounter._char_counter(dirty_str_genexp)
+        clean_counted_list = WordCounter._char_counter(generator_words_dirty(), num_words=3)
         words_only = [word[0] for word in clean_counted_list]
 
         assert 'dfadfskj' not in english_dict
