@@ -11,16 +11,16 @@ class WordCounter:
     from types import GeneratorType
 
     @staticmethod
-    def _char_counter(sanitized_text_gen: GeneratorType, num_words: int=10):
+    def _char_counter(sanitized_text_gen: GeneratorType, length: int = 10):
         from collections import Counter
         from types import GeneratorType
 
         # 230k+ words from the standard UNIX dict in a local text file ('/usr/share/dict/words')
-        ENGLISH_WORDS = './static/english_words.txt'
+        english_words = './static/english_words.txt'
 
         assert isinstance(sanitized_text_gen, GeneratorType)
 
-        with open(ENGLISH_WORDS, 'rt') as eng_dict:
+        with open(english_words, 'rt') as eng_dict:
             english_dict = list(set([eng_word.lower().rstrip('\n') for eng_word in eng_dict.readlines()]))
 
         master_word_count = Counter()
@@ -28,17 +28,18 @@ class WordCounter:
         for w_line in sanitized_text_gen:
             master_word_count.update(Counter(w_line.split()))
 
-        if not num_words:
-            master_word_list = [word for word in master_word_count.items() if word[0] in english_dict]
-            master_word_list.sort(key=lambda wc: wc[1], reverse=True)
-            return master_word_list
-        else:
-            master_word_list = []
-            most_common_gen = (word for word in master_word_count.most_common() if word[0] in english_dict)
-            while len(master_word_list) < num_words:
+        master_word_list = []
+        most_common_gen = (word for word in master_word_count.most_common() if word[0] in english_dict)
+
+        if length:
+            while len(master_word_list) < length:
                 master_word_list.append(next(most_common_gen))
-            master_word_list.sort(key=lambda counter_obj: counter_obj[1], reverse=True)
-            return master_word_list[:num_words]
+        else:
+            for word in most_common_gen:
+                master_word_list.append(word)
+
+        master_word_list.sort(key=lambda counter_obj: counter_obj[1], reverse=True)
+        return master_word_list
 
     @staticmethod
     def __sanitize(string_list: list):
@@ -123,11 +124,13 @@ class LetterCounter(WordCounter):
     from types import GeneratorType
 
     @staticmethod
-    def _char_counter(sanitized_text_gen: GeneratorType, num_letters: int=10):
+    def _char_counter(sanitized_text_gen: GeneratorType, length: int = 10):
         from collections import Counter
         from types import GeneratorType
         import re
 
+        if length:
+            assert length <= 26
         assert isinstance(sanitized_text_gen, GeneratorType)
 
         english_letters = re.compile("[a-z]")
@@ -138,15 +141,16 @@ class LetterCounter(WordCounter):
             ns_w_line = list(''.join(w_line))
             master_letter_count.update(Counter(ns_w_line))
 
-        if not num_letters:
-            master_letter_list = [letter for letter in master_letter_count.items() if english_letters.match(letter[0])]
-            master_letter_list.sort(key=lambda lc: lc[1], reverse=True)
-            return master_letter_list
-        else:
-            master_letter_list = list()
-            common_letters_gen = (letter for letter in master_letter_count.most_common() if english_letters.match(
-                letter[0]))
-            while len(master_letter_list) < num_letters:
+        master_letter_list = list()
+        common_letters_gen = (letter for letter in master_letter_count.most_common() if english_letters.match(
+            letter[0]))
+
+        if length:
+            while len(master_letter_list) < length:
                 master_letter_list.append(next(common_letters_gen))
-            master_letter_list.sort(key=lambda counter_obj: counter_obj[1], reverse=True)
-            return master_letter_list[:num_letters]
+        else:
+            for letter in common_letters_gen:
+                master_letter_list.append(letter)
+
+        master_letter_list.sort(key=lambda counter_obj: counter_obj[1], reverse=True)
+        return master_letter_list
