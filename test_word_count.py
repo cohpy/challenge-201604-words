@@ -89,8 +89,12 @@ class TestLetterCounter:
             letter_count = LetterCounter().read_in_file(filepath=FRANKEN_TEXT, length=n_letters)
             assert len(letter_count) == n_letters
 
+    def test_all_letters(self):
+
+        assert LetterCounter().read_in_file(filepath=FRANKEN_TEXT, length=None)
+
     def test_counts_letters_only(self):
         n_letters = 27
 
-        with pytest.raises(StopIteration):
+        with pytest.raises(AssertionError):
             LetterCounter().read_in_file(filepath=FRANKEN_TEXT, length=n_letters)
