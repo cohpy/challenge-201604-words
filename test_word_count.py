@@ -74,6 +74,10 @@ class TestWordCounter:
             word_count = WordCounter().read_in_file(filepath=TARGET_FILE, length=n_words)
             assert len(word_count) == n_words
 
+    def test_all_words(self):
+
+            assert WordCounter().read_in_file(filepath=TARGET_FILE, length=None)
+
 
 class TestLetterCounter:
 

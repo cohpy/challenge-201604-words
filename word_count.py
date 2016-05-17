@@ -28,17 +28,20 @@ class WordCounter:
         for w_line in sanitized_text_gen:
             master_word_count.update(Counter(w_line.split()))
 
+        master_word_list = []
+        most_common_gen = (word for word in master_word_count.most_common() if word[0] in english_dict)
+
         if not num_words:
-            master_word_list = [word for word in master_word_count.items() if word[0] in english_dict]
-            master_word_list.sort(key=lambda wc: wc[1], reverse=True)
-            return master_word_list
+            try:
+                master_word_list.append(next(most_common_gen))
+            except StopIteration as e:
+                print(e)
         else:
-            master_word_list = []
-            most_common_gen = (word for word in master_word_count.most_common() if word[0] in english_dict)
             while len(master_word_list) < num_words:
                 master_word_list.append(next(most_common_gen))
-            master_word_list.sort(key=lambda counter_obj: counter_obj[1], reverse=True)
-            return master_word_list[:num_words]
+
+        master_word_list.sort(key=lambda counter_obj: counter_obj[1], reverse=True)
+        return master_word_list
 
     @staticmethod
     def __sanitize(string_list: list):
