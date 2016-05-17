@@ -133,24 +133,23 @@ class LetterCounter(WordCounter):
             assert length <= 26
         assert isinstance(sanitized_text_gen, GeneratorType)
 
-        english_letters = re.compile("[a-z]")
+        english_ltrs = re.compile("[a-z]")
 
-        master_letter_count = Counter()
+        master_ltr_count = Counter()
 
         for w_line in sanitized_text_gen:
             ns_w_line = list(''.join(w_line))
-            master_letter_count.update(Counter(ns_w_line))
+            master_ltr_count.update(Counter(ns_w_line))
 
-        master_letter_list = list()
-        common_letters_gen = (letter for letter in master_letter_count.most_common() if english_letters.match(
-            letter[0]))
+        master_ltr_list = list()
+        common_ltrs_gen = (ltr for ltr in master_ltr_count.most_common() if english_ltrs.match(ltr[0]))
 
         if length:
-            while len(master_letter_list) < length:
-                master_letter_list.append(next(common_letters_gen))
+            while len(master_ltr_list) < length:
+                master_ltr_list.append(next(common_ltrs_gen))
         else:
-            for letter in common_letters_gen:
-                master_letter_list.append(letter)
+            for ltr in common_ltrs_gen:
+                master_ltr_list.append(ltr)
 
-        master_letter_list.sort(key=lambda counter_obj: counter_obj[1], reverse=True)
-        return master_letter_list
+        master_ltr_list.sort(key=lambda counter_obj: counter_obj[1], reverse=True)
+        return master_ltr_list
