@@ -5,11 +5,12 @@ import pytest
 from word_count import WordCounter, LetterCounter
 
 
-TARGET_STRING = 'This is? my file.\nIt is alright I suppose...\nThis is !really! just a test.\nI hope it, works'
-TARGET_STRING2 = 'This is just another string but longer and with no newlines to test the read_in_string method. is is.'
-# Target text to be read (Frankenstein)
-TARGET_FILE = './static/pg83.txt'
-TARGET_FILE2 = './static/pg84.txt'
+MANU_STRING = 'This is? my file.\nIt is alright I suppose...\nThis is !really! just a test.\nI hope it, works'
+MANU_STRING_2 = 'This is just another string but longer and with no newlines to test the read_in_string method. is is.'
+
+FRANKEN_TEXT = './static/pg83.txt'
+MOON_TEXT = './static/pg84.txt'
+MANU_TEXT = './static/test.txt'
 
 
 @pytest.fixture("class")
@@ -35,12 +36,12 @@ class TestWordCounter:
 
         for not_gen in not_str_gens:
             with pytest.raises(AssertionError):
-                WordCounter._char_counter(not_gen, num_words=5)
+                WordCounter._char_counter(not_gen, length=5)
 
-        assert WordCounter._char_counter(generator_words_good(), num_words=5)
+        assert WordCounter._char_counter(generator_words_good(), length=5)
 
     def test_char_counter_returns_list_of_tuples_of_strings_and_counts_in_desc_order(self):
-        counted_list = WordCounter._char_counter(generator_words_good(), num_words=5)
+        counted_list = WordCounter._char_counter(generator_words_good(), length=5)
         counts_only = [obj[1] for obj in counted_list]
 
         assert isinstance(counted_list, list)
@@ -58,7 +59,7 @@ class TestWordCounter:
         with open(english_words, 'rt') as eng_dict:
             english_dict = list(set([eng_word.lower().rstrip('\n') for eng_word in eng_dict.readlines()]))
 
-        clean_counted_list = WordCounter._char_counter(generator_words_dirty(), num_words=3)
+        clean_counted_list = WordCounter._char_counter(generator_words_dirty(), length=3)
         words_only = [word[0] for word in clean_counted_list]
 
         assert 'dfadfskj' not in english_dict
@@ -71,12 +72,12 @@ class TestWordCounter:
         n_words_tup = 15, 35
 
         for n_words in n_words_tup:
-            word_count = WordCounter().read_in_file(filepath=TARGET_FILE, length=n_words)
+            word_count = WordCounter().read_in_file(filepath=FRANKEN_TEXT, length=n_words)
             assert len(word_count) == n_words
 
     def test_all_words(self):
 
-            assert WordCounter().read_in_file(filepath=TARGET_FILE, length=None)
+            assert WordCounter().read_in_file(filepath=MANU_TEXT, length=None)
 
 
 class TestLetterCounter:
@@ -85,11 +86,11 @@ class TestLetterCounter:
         n_letters_tup = 1, 26
 
         for n_letters in n_letters_tup:
-            letter_count = LetterCounter().read_in_file(filepath=TARGET_FILE, length=n_letters)
+            letter_count = LetterCounter().read_in_file(filepath=FRANKEN_TEXT, length=n_letters)
             assert len(letter_count) == n_letters
 
     def test_counts_letters_only(self):
         n_letters = 27
 
         with pytest.raises(StopIteration):
-            LetterCounter().read_in_file(filepath=TARGET_FILE, length=n_letters)
+            LetterCounter().read_in_file(filepath=FRANKEN_TEXT, length=n_letters)

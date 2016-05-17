@@ -11,7 +11,7 @@ class WordCounter:
     from types import GeneratorType
 
     @staticmethod
-    def _char_counter(sanitized_text_gen: GeneratorType, num_words: int=10):
+    def _char_counter(sanitized_text_gen: GeneratorType, length: int=10):
         from collections import Counter
         from types import GeneratorType
 
@@ -31,14 +31,12 @@ class WordCounter:
         master_word_list = []
         most_common_gen = (word for word in master_word_count.most_common() if word[0] in english_dict)
 
-        if not num_words:
-            try:
+        if length:
+            while len(master_word_list) < length:
                 master_word_list.append(next(most_common_gen))
-            except StopIteration as e:
-                print(e)
         else:
-            while len(master_word_list) < num_words:
-                master_word_list.append(next(most_common_gen))
+            for word in most_common_gen:
+                master_word_list.append(word)
 
         master_word_list.sort(key=lambda counter_obj: counter_obj[1], reverse=True)
         return master_word_list
