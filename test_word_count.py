@@ -75,6 +75,10 @@ class TestWordCounter:
             word_count = WordCounter().read_in_file(filepath=FRANKEN_TEXT, length=n_words)
             assert len(word_count) == n_words
 
+    def test_return_all_if_len_gt_words_in_text(self):
+
+        assert WordCounter().read_in_file(filepath=MANU_TEXT, length=500)
+
     def test_all_words(self):
 
             assert WordCounter().read_in_file(filepath=MANU_TEXT, length=None)
@@ -96,5 +100,5 @@ class TestLetterCounter:
     def test_counts_letters_only(self):
         n_letters = 27
 
-        with pytest.raises(AssertionError):
-            LetterCounter().read_in_file(filepath=FRANKEN_TEXT, length=n_letters)
+        letter_count = LetterCounter().read_in_file(filepath=FRANKEN_TEXT, length=n_letters)
+        assert len(letter_count) == 26

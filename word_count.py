@@ -140,8 +140,8 @@ class LetterCounter(WordCounter):
         from types import GeneratorType
         import re
 
-        if length:
-            assert length <= 26
+        # if length:
+        #    assert length <= 26
         assert isinstance(sanitized_text_gen, GeneratorType)
 
         english_ltrs = re.compile("[a-z]")
@@ -157,7 +157,10 @@ class LetterCounter(WordCounter):
 
         if length:
             while len(master_ltr_list) < length:
-                master_ltr_list.append(next(common_ltrs_gen))
+                try:
+                    master_ltr_list.append(next(common_ltrs_gen))
+                except StopIteration:
+                    break
         else:
             for ltr in common_ltrs_gen:
                 master_ltr_list.append(ltr)
