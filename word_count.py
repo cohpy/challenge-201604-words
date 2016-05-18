@@ -11,7 +11,14 @@ class WordCounter:
     from types import GeneratorType
 
     @staticmethod
-    def _char_counter(sanitized_text_gen: GeneratorType, length: int = 10):
+    def _char_counter(sanitized_text_gen: GeneratorType, length: int):
+        """
+        Iterate through genexp provided by one of the read_in methods, counting all words passed and cross-checking
+        results against the UNIX words file/dictionary and adding those that are to the output list until the list
+        length meets passed length param or all English words if length=None. The list of valid English words is
+        sorted in descending order before being returned.
+        """
+
         from collections import Counter
         from types import GeneratorType
 
@@ -44,11 +51,12 @@ class WordCounter:
     @staticmethod
     def __sanitize(string_list: list):
         """
-        Performs additional processing (sanitzation) of text. Will strip white space from start and end of string,
+        Performs additional processing (sanitization) of text. Will strip white space from start and end of string,
         remove special characters, downcase all letters, replace any white space w/single space. Private method
         utilized by class methods.
         """
 
+        from types import GeneratorType
         import re
 
         assert isinstance(string_list, list)
@@ -56,16 +64,16 @@ class WordCounter:
         white_space_re = re.compile("\s+")
         special_chars_re = re.compile("[-\"\':;.?!,\(\)\d]+")
 
-        trimmed_text = [w_line.strip() for w_line in string_list if w_line]
-        extra_ws_processed_text = [white_space_re.sub(' ', w_line) for w_line in trimmed_text]
-        spec_char_killer_processed_text = [special_chars_re.sub('', w_line) for w_line in extra_ws_processed_text]
-        sanitized_text = [w_line.lower() for w_line in spec_char_killer_processed_text]
+        trimmed_text = (w_line.strip() for w_line in string_list if w_line)
+        extra_ws_processed_text = (white_space_re.sub(' ', w_line) for w_line in trimmed_text)
+        spec_char_killer_processed_text = (special_chars_re.sub('', w_line) for w_line in extra_ws_processed_text)
+        sanitized_text = (w_line.lower() for w_line in spec_char_killer_processed_text)
 
-        assert isinstance(sanitized_text, list)
+        assert isinstance(sanitized_text, GeneratorType)
         for sanitized_line in sanitized_text:
             yield sanitized_line
 
-    def read_in_string(self, string: str, length: int):
+    def read_in_string(self, string: str, length: int=10):
         """
         return a sorted list of the #length# most common words and their counts in a tuple.
         """
@@ -79,12 +87,12 @@ class WordCounter:
         if new_line_re.search(string):
             chunked_text = new_line_re.split(string)
         else:
-            chunked_text = [string]
+            chunked_text = list(string)
 
         assert isinstance(chunked_text, list)
         return self._char_counter(self.__sanitize(chunked_text), length)
 
-    def read_in_file(self, filepath: str, length: int):
+    def read_in_file(self, filepath: str, length: int=10):
         """
         return sorted list of the #length# most common words and their counts in a tuple.
         """
@@ -124,7 +132,7 @@ class LetterCounter(WordCounter):
     from types import GeneratorType
 
     @staticmethod
-    def _char_counter(sanitized_text_gen: GeneratorType, length: int = 10):
+    def _char_counter(sanitized_text_gen: GeneratorType, length: int):
         from collections import Counter
         from types import GeneratorType
         import re
@@ -152,4 +160,5 @@ class LetterCounter(WordCounter):
                 master_ltr_list.append(ltr)
 
         master_ltr_list.sort(key=lambda counter_obj: counter_obj[1], reverse=True)
+        assert isinstance(master_ltr_list, list)
         return master_ltr_list
