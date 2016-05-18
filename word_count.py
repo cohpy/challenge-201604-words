@@ -48,11 +48,12 @@ class WordCounter:
             for word in most_common_gen:
                 master_word_list.append(word)
 
+        assert isinstance(master_word_list, list)
         master_word_list.sort(key=lambda counter_obj: counter_obj[1], reverse=True)
         return master_word_list
 
     @staticmethod
-    def __sanitize(string_list: list):
+    def _sanitize(string_list: list):
         """
         Performs additional processing (sanitization) of text. Will strip white space from start and end of string,
         remove special characters, downcase all letters, replace any white space w/single space. Private method
@@ -65,7 +66,7 @@ class WordCounter:
         assert isinstance(string_list, list)
 
         white_space_re = re.compile("\s+")
-        special_chars_re = re.compile("[-\"\':;.?!,\(\)\d]+")
+        special_chars_re = re.compile("[-\"\'|:;.?!,\(\)\d]+")
 
         trimmed_text = (w_line.strip() for w_line in string_list if w_line)
         extra_ws_processed_text = (white_space_re.sub(' ', w_line) for w_line in trimmed_text)
@@ -93,7 +94,7 @@ class WordCounter:
             chunked_text = list(string)
 
         assert isinstance(chunked_text, list)
-        return self._char_counter(self.__sanitize(chunked_text), length)
+        return self._char_counter(self._sanitize(chunked_text), length)
 
     def read_in_file(self, filepath: str, length: int=10):
         """
@@ -123,7 +124,7 @@ class WordCounter:
                 chunked_text = [working_text]
 
         assert isinstance(chunked_text, list)
-        return self._char_counter(self.__sanitize(chunked_text), length)
+        return self._char_counter(self._sanitize(chunked_text), length)
 
 
 class LetterCounter(WordCounter):
