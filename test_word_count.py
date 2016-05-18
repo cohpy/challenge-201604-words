@@ -5,7 +5,7 @@ import pytest
 from word_count import WordCounter, LetterCounter
 
 
-MANU_STRING = 'This is? my file.\nIt is alright I suppose...\nThis is !really! just a test.\nI hope it, works'
+MANU_STRING = 'This is?\r my |file.\nIt is alright\t 123 I suppose...\nThis is !really! just a test.\nI hope it, works'
 MANU_STRING_2 = 'This is just another string but longer and with no newlines to test the read_in_string method. is is.'
 
 FRANKEN_TEXT = './static/pg83.txt'
@@ -25,7 +25,7 @@ def generator_words_dirty():
     import re
 
     return (word for word in re.split(
-        "\s+", 'This is just| test.. dfadfskj see ?!%G1 is ?!%G1 will dfadfskj'))
+        "\s+", 'This is just| test.. dfadfskj see 123 ?!%G1 is ?!%G1 will dfadfskj'))
 
 
 @pytest.mark.usefixtures("generator_words_good", "generator_words_dirty")
@@ -75,9 +75,24 @@ class TestWordCounter:
             word_count = WordCounter().read_in_file(filepath=FRANKEN_TEXT, length=n_words)
             assert len(word_count) == n_words
 
+    def test_return_all_if_len_gt_words_in_text(self):
+
+        assert WordCounter().read_in_file(filepath=MANU_TEXT, length=500)
+
     def test_all_words(self):
 
             assert WordCounter().read_in_file(filepath=MANU_TEXT, length=None)
+
+    def test_sanitizer_sanitizes(self):
+        import re
+
+        spec_chars_re = re.compile("[\d\t\r?|!]")
+
+        strings = MANU_STRING.split('\n')
+        sani_gen = WordCounter._sanitize(string_list=strings)
+
+        for string in sani_gen:
+            assert not spec_chars_re.findall(string)
 
 
 class TestLetterCounter:
@@ -96,5 +111,5 @@ class TestLetterCounter:
     def test_counts_letters_only(self):
         n_letters = 27
 
-        with pytest.raises(AssertionError):
-            LetterCounter().read_in_file(filepath=FRANKEN_TEXT, length=n_letters)
+        letter_count = LetterCounter().read_in_file(filepath=FRANKEN_TEXT, length=n_letters)
+        assert len(letter_count) == 26
