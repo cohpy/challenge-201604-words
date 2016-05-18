@@ -40,7 +40,10 @@ class WordCounter:
 
         if length:
             while len(master_word_list) < length:
-                master_word_list.append(next(most_common_gen))
+                try:
+                    master_word_list.append(next(most_common_gen))
+                except StopIteration:
+                    break
         else:
             for word in most_common_gen:
                 master_word_list.append(word)
