@@ -97,7 +97,7 @@ class TestWordCounter:
 
         assert next(WordCounter()._sanitize(string_list=strings_list()))
         assert next(WordCounter()._sanitize(string_list=strings_tuple))
-        assert isinstance((WordCounter()._sanitize(string_list=strings_list())), GeneratorType)
+        assert isinstance(WordCounter()._sanitize(string_list=strings_list()), GeneratorType)
 
         with pytest.raises(AssertionError):
             next(WordCounter()._sanitize(string_list=1))
@@ -122,7 +122,7 @@ class TestWordCounter:
             WordCounter().read_in_file(filepath='/Users/NONE/')
             WordCounter().read_in_file(filepath='/Users/cwandrews')
 
-        assert isinstance((WordCounter().read_in_file(filepath=MANU_TEXT)), list)
+        assert isinstance(WordCounter().read_in_file(filepath=MANU_TEXT), list)
 
         for count_tuple in WordCounter().read_in_file(filepath=FRANKEN_TEXT_ABRIDGED, length=None):
             assert not gutenberg_re.findall(count_tuple[0])
@@ -133,10 +133,26 @@ class TestWordCounter:
             WordCounter().read_in_string(string=strings_list())
             WordCounter().read_in_string(string=145)
 
-        assert isinstance((WordCounter().read_in_string(string=strings_list())), list)
+        assert isinstance((WordCounter().read_in_string(string=MANU_STRING)), list)
 
 
 class TestLetterCounter:
+
+    def test_char_counter_io(self):
+
+        with pytest.raises(AssertionError):
+            LetterCounter()._char_counter(sanitized_text_gen=strings_list(), length=5)
+            LetterCounter()._char_counter(sanitized_text_gen=MANU_STRING, length=5)
+
+        assert isinstance(LetterCounter()._char_counter(sanitized_text_gen=generator_words_good(), length=5), list)
+
+    def test_letter_counter_io(self):
+
+        assert LetterCounter().read_in_file(filepath=FRANKEN_TEXT_ABRIDGED)
+        assert LetterCounter().read_in_string(string=MANU_STRING)
+
+        assert isinstance(LetterCounter().read_in_file(filepath=FRANKEN_TEXT_ABRIDGED), list)
+        assert isinstance(LetterCounter().read_in_string(string=MANU_STRING), list)
 
     def test_diff_n_letters(self):
         n_letters_tup = 1, 26
