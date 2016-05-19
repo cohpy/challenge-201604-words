@@ -27,27 +27,22 @@ def generator_words_dirty():
     return (word for word in re.split(
         "\s+", 'This is just| test.. dfadfskj see 123 ?!%G1 is ?!%G1 will dfadfskj'))
 
+
 @pytest.fixture("class")
 def strings_list():
 
     return MANU_STRING.split('\n')
 
 
-@pytest.mark.usefixtures("generator_words_good", "generator_words_dirty")
+@pytest.mark.usefixtures("generator_words_good", "generator_words_dirty", "strings_list")
 class TestWordCounter:
 
-    def test_char_counter_takes_str_gen_only(self):
+    def test_char_counter_io(self):
         not_str_gens = tuple(), list(), dict(), set(), int(), str(), bytes(), float(), complex()
-
-        for not_gen in not_str_gens:
-            with pytest.raises(AssertionError):
-                WordCounter._char_counter(not_gen, length=5)
-
-        assert WordCounter._char_counter(generator_words_good(), length=5)
-
-    def test_char_counter_returns_list_of_tuples_of_strings_and_counts_in_desc_order(self):
         counted_list = WordCounter._char_counter(generator_words_good(), length=5)
         counts_only = [obj[1] for obj in counted_list]
+
+        assert WordCounter._char_counter(generator_words_dirty(), 5)
 
         assert isinstance(counted_list, list)
 
@@ -59,7 +54,13 @@ class TestWordCounter:
         for i in range(len(counts_only) - 1):
             assert counts_only[i] >= counts_only[i + 1]
 
-    def test_char_counter_returns_no_non_english_words(self):
+        for not_gen in not_str_gens:
+            with pytest.raises(AssertionError):
+                WordCounter._char_counter(not_gen, length=5)
+
+        assert WordCounter._char_counter(generator_words_good(), length=5)
+
+    def test_char_counter_returns_only_english_words(self):
         english_words = './static/english_words.txt'
         with open(english_words, 'rt') as eng_dict:
             english_dict = list(set([eng_word.lower().rstrip('\n') for eng_word in eng_dict.readlines()]))
@@ -73,7 +74,7 @@ class TestWordCounter:
         for word in words_only:
             assert word in english_dict
 
-    def test_diff_n_words(self):
+    def test_length_matches_returned_word_count(self):
         n_words_tup = 15, 35
 
         for n_words in n_words_tup:
@@ -84,19 +85,9 @@ class TestWordCounter:
 
         assert WordCounter().read_in_file(filepath=MANU_TEXT, length=500)
 
-    def test_all_words(self):
+    def test_length_none_returns_all_words(self):
 
             assert WordCounter().read_in_file(filepath=MANU_TEXT, length=None)
-
-    def test_sanitizer_sanitizes(self):
-        import re
-
-        spec_chars_re = re.compile("[\d\t\r?|!]")
-
-        sanitized_gen = WordCounter._sanitize(string_list=strings_list())
-
-        for string in sanitized_gen:
-            assert not spec_chars_re.findall(string)
 
     def test_sanitizer_io(self):
         from types import GeneratorType
@@ -110,6 +101,16 @@ class TestWordCounter:
         with pytest.raises(AssertionError):
             next(WordCounter()._sanitize(string_list=1))
             next(WordCounter()._sanitize(string_list='just a string'))
+
+    def test_sanitizer_sanitizes(self):
+        import re
+
+        spec_chars_re = re.compile("[\d\t\r?|!]")
+
+        sanitized_gen = WordCounter._sanitize(string_list=strings_list())
+
+        for string in sanitized_gen:
+            assert not spec_chars_re.findall(string)
 
 
 class TestLetterCounter:
