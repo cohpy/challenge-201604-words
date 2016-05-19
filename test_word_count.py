@@ -9,6 +9,7 @@ MANU_STRING = 'This is?\r my |file.\nIt is alright\t 123 I suppose...\nThis is !
 MANU_STRING_2 = 'This is just another string but longer and with no newlines to test the read_in_string method. is is.'
 
 FRANKEN_TEXT = './static/pg83.txt'
+FRANKEN_TEXT_ABRIDGED = './static/pg84_super_abridged.txt'
 MOON_TEXT = './static/pg84.txt'
 MANU_TEXT = './static/test.txt'
 
@@ -111,6 +112,28 @@ class TestWordCounter:
 
         for string in sanitized_gen:
             assert not spec_chars_re.findall(string)
+
+    def test_read_in_file_io(self):
+        import re
+
+        gutenberg_re = re.compile("(ebook|electronic|computer)")
+
+        with pytest.raises(AssertionError):
+            WordCounter().read_in_file(filepath='/Users/NONE/')
+            WordCounter().read_in_file(filepath='/Users/cwandrews')
+
+        assert isinstance((WordCounter().read_in_file(filepath=MANU_TEXT)), list)
+
+        for count_tuple in WordCounter().read_in_file(filepath=FRANKEN_TEXT_ABRIDGED, length=None):
+            assert not gutenberg_re.findall(count_tuple[0])
+
+    def test_read_in_string_io(self):
+
+        with pytest.raises(AssertionError):
+            WordCounter().read_in_string(string=strings_list())
+            WordCounter().read_in_string(string=145)
+
+        assert isinstance((WordCounter().read_in_string(string=strings_list())), list)
 
 
 class TestLetterCounter:

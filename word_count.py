@@ -35,7 +35,7 @@ class WordCounter:
         for w_line in sanitized_text_gen:
             master_word_count.update(Counter(w_line.split()))
 
-        master_word_list = []
+        master_word_list = list()
         most_common_gen = (word for word in master_word_count.most_common() if word[0] in english_dict)
 
         if length:
@@ -77,26 +77,7 @@ class WordCounter:
         for sanitized_line in sanitized_text:
             yield sanitized_line
 
-    def read_in_string(self, string: str, length: int=10):
-        """
-        return a sorted list of the #length# most common words and their counts in a tuple.
-        """
-
-        import re
-
-        assert isinstance(string, str)
-
-        new_line_re = re.compile("[\n\r]")
-
-        if new_line_re.search(string):
-            chunked_text = new_line_re.split(string)
-        else:
-            chunked_text = list(string)
-
-        assert isinstance(chunked_text, list)
-        return self._char_counter(self._sanitize(chunked_text), length)
-
-    def read_in_file(self, filepath: str, length: int=10):
+    def read_in_file(self, filepath: str, length: int = 10):
         """
         return sorted list of the #length# most common words and their counts in a tuple.
         """
@@ -126,6 +107,25 @@ class WordCounter:
         assert isinstance(chunked_text, list)
         return self._char_counter(self._sanitize(chunked_text), length)
 
+    def read_in_string(self, string: str, length: int=10):
+        """
+        return a sorted list of the #length# most common words and their counts in a tuple.
+        """
+
+        import re
+
+        assert isinstance(string, str)
+
+        new_line_re = re.compile("[\n\r]")
+
+        if new_line_re.search(string):
+            chunked_text = new_line_re.split(string)
+        else:
+            chunked_text = list(string)
+
+        assert isinstance(chunked_text, list)
+        return self._char_counter(self._sanitize(chunked_text), length)
+
 
 class LetterCounter(WordCounter):
     """
@@ -141,8 +141,6 @@ class LetterCounter(WordCounter):
         from types import GeneratorType
         import re
 
-        # if length:
-        #    assert length <= 26
         assert isinstance(sanitized_text_gen, GeneratorType)
 
         english_ltrs = re.compile("[a-z]")
