@@ -27,6 +27,11 @@ def generator_words_dirty():
     return (word for word in re.split(
         "\s+", 'This is just| test.. dfadfskj see 123 ?!%G1 is ?!%G1 will dfadfskj'))
 
+@pytest.fixture("class")
+def strings_list():
+
+    return MANU_STRING.split('\n')
+
 
 @pytest.mark.usefixtures("generator_words_good", "generator_words_dirty")
 class TestWordCounter:
@@ -88,11 +93,23 @@ class TestWordCounter:
 
         spec_chars_re = re.compile("[\d\t\r?|!]")
 
-        strings = MANU_STRING.split('\n')
-        sani_gen = WordCounter._sanitize(string_list=strings)
+        sanitized_gen = WordCounter._sanitize(string_list=strings_list())
 
-        for string in sani_gen:
+        for string in sanitized_gen:
             assert not spec_chars_re.findall(string)
+
+    def test_sanitizer_io(self):
+        from types import GeneratorType
+
+        strings_tuple = tuple(strings_list())
+
+        assert next(WordCounter()._sanitize(string_list=strings_list()))
+        assert next(WordCounter()._sanitize(string_list=strings_tuple))
+        assert isinstance((WordCounter()._sanitize(string_list=strings_list())), GeneratorType)
+
+        with pytest.raises(AssertionError):
+            next(WordCounter()._sanitize(string_list=1))
+            next(WordCounter()._sanitize(string_list='just a string'))
 
 
 class TestLetterCounter:

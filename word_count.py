@@ -53,7 +53,7 @@ class WordCounter:
         return master_word_list
 
     @staticmethod
-    def _sanitize(string_list: list):
+    def _sanitize(string_list: (list, tuple)):
         """
         Performs additional processing (sanitization) of text. Will strip white space from start and end of string,
         remove special characters, downcase all letters, replace any white space w/single space. Private method
@@ -63,7 +63,7 @@ class WordCounter:
         from types import GeneratorType
         import re
 
-        assert isinstance(string_list, list)
+        assert isinstance(string_list, (list, tuple))
 
         white_space_re = re.compile("\s+")
         special_chars_re = re.compile("[-\"\'|:;.?!,\(\)\d]+")
