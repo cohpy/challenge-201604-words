@@ -69,18 +69,16 @@ class TestWordCounter:
         clean_counted_list = WordCounter._char_counter(generator_words_dirty(), length=3)
         words_only = [word[0] for word in clean_counted_list]
 
-        assert 'dfadfskj' not in english_dict
-        assert '?!%G1' not in english_dict
+        for not_word in ('dfadfskj', '?!%G1'):
+            assert not_word not in english_dict
 
         for word in words_only:
             assert word in english_dict
 
     def test_length_matches_returned_word_count(self):
-        n_words_tup = 15, 35
 
-        for n_words in n_words_tup:
-            word_count = WordCounter().read_in_file(filepath=FRANKEN_TEXT, length=n_words)
-            assert len(word_count) == n_words
+        for n_words in (15, 35):
+            assert len(WordCounter().read_in_file(filepath=FRANKEN_TEXT, length=n_words)) == n_words
 
     def test_return_all_if_len_gt_words_in_text(self):
 
@@ -88,16 +86,14 @@ class TestWordCounter:
 
     def test_length_none_returns_all_words(self):
 
-            assert WordCounter().read_in_file(filepath=MANU_TEXT, length=None)
+        assert WordCounter().read_in_file(filepath=MANU_TEXT, length=None)
 
     def test_sanitizer_io(self):
         from types import GeneratorType
 
-        strings_tuple = tuple(strings_list())
-
-        assert next(WordCounter()._sanitize(string_list=strings_list()))
-        assert next(WordCounter()._sanitize(string_list=strings_tuple))
-        assert isinstance(WordCounter()._sanitize(string_list=strings_list()), GeneratorType)
+        for iterable_obj in (strings_list(), tuple(strings_list())):
+            assert next(WordCounter()._sanitize(string_list=iterable_obj))
+            assert isinstance(WordCounter()._sanitize(string_list=iterable_obj), GeneratorType)
 
         with pytest.raises(AssertionError):
             next(WordCounter()._sanitize(string_list=1))
@@ -108,9 +104,7 @@ class TestWordCounter:
 
         spec_chars_re = re.compile("[\d\t\r?|!]")
 
-        sanitized_gen = WordCounter._sanitize(string_list=strings_list())
-
-        for string in sanitized_gen:
+        for string in WordCounter._sanitize(string_list=strings_list()):
             assert not spec_chars_re.findall(string)
 
     def test_read_in_file_io(self):
@@ -149,9 +143,9 @@ class TestLetterCounter:
     def test_letter_counter_io(self):
 
         assert LetterCounter().read_in_file(filepath=FRANKEN_TEXT_ABRIDGED)
-        assert LetterCounter().read_in_string(string=MANU_STRING)
-
         assert isinstance(LetterCounter().read_in_file(filepath=FRANKEN_TEXT_ABRIDGED), list)
+
+        assert LetterCounter().read_in_string(string=MANU_STRING)
         assert isinstance(LetterCounter().read_in_string(string=MANU_STRING), list)
 
     def test_diff_n_letters(self):
@@ -163,10 +157,8 @@ class TestLetterCounter:
 
     def test_all_letters(self):
 
-        assert LetterCounter().read_in_file(filepath=FRANKEN_TEXT, length=None)
+        assert LetterCounter().read_in_file(filepath=FRANKEN_TEXT_ABRIDGED, length=None)
 
     def test_counts_letters_only(self):
-        n_letters = 27
 
-        letter_count = LetterCounter().read_in_file(filepath=FRANKEN_TEXT, length=n_letters)
-        assert len(letter_count) == 26
+        assert len(LetterCounter().read_in_file(filepath=FRANKEN_TEXT, length=27)) == 26
