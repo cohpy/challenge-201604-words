@@ -1,6 +1,7 @@
 # coding = utf-8
 # __author__ = cwandrews
 import pytest
+import re
 
 from word_count import WordCounter, LetterCounter
 
@@ -17,14 +18,12 @@ MANU_TEXT_2 = './static/one_line_test.txt'
 
 @pytest.fixture("class")
 def generator_words_good():
-    import re
 
     return (word for word in re.split("\s+", 'This is just for a test.. to see how well...'))
 
 
 @pytest.fixture("class")
 def generator_words_dirty():
-    import re
 
     return (word for word in re.split(
         "\s+", 'This is just| test.. dfadfskj see 123 ?!%G1 is ?!%G1 will dfadfskj'))
@@ -81,7 +80,7 @@ class TestWordCounter:
         for n_words in (15, 35):
             assert len(WordCounter().read_in_file(filepath=FRANKEN_TEXT, length=n_words)) == n_words
 
-    def test_return_all_if_len_gt_words_in_text(self):
+    def test_return_all_if_length_gt_words_in_text(self):
 
         assert WordCounter().read_in_file(filepath=MANU_TEXT, length=500)
 
@@ -96,12 +95,11 @@ class TestWordCounter:
             assert next(WordCounter()._sanitize(string_list=iterable_obj))
             assert isinstance(WordCounter()._sanitize(string_list=iterable_obj), GeneratorType)
 
-        with pytest.raises(AssertionError):
-            next(WordCounter()._sanitize(string_list=1))
-            next(WordCounter()._sanitize(string_list='just a string'))
+        for test_type in (1, 'just a string'):
+            with pytest.raises(AssertionError):
+                next(WordCounter()._sanitize(string_list=test_type))
 
     def test_sanitizer_sanitizes(self):
-        import re
 
         spec_chars_re = re.compile("[\d\t\r?|!]")
 
@@ -109,37 +107,36 @@ class TestWordCounter:
             assert not spec_chars_re.findall(string)
 
     def test_read_in_file_io(self):
-        import re
 
         gutenberg_re = re.compile("(ebook|electronic|computer)")
 
-        with pytest.raises(AssertionError):
-            WordCounter().read_in_file(filepath='/Users/NONE/')
-            WordCounter().read_in_file(filepath='/Users/cwandrews')
+        for test_path in ('/Users/NONE/', '/Users/cwandrews'):
+            with pytest.raises(AssertionError):
+                WordCounter().read_in_file(filepath=test_path)
 
-        assert isinstance(WordCounter().read_in_file(filepath=MANU_TEXT), list)
-        assert isinstance(WordCounter().read_in_file(filepath=MANU_TEXT_2), list)
+        for test_text in (MANU_TEXT, MANU_TEXT_2):
+            assert isinstance(WordCounter().read_in_file(filepath=test_text), list)
 
         for count_tuple in WordCounter().read_in_file(filepath=FRANKEN_TEXT_ABRIDGED, length=None):
             assert not gutenberg_re.findall(count_tuple[0])
 
     def test_read_in_string_io(self):
 
-        with pytest.raises(AssertionError):
-            WordCounter().read_in_string(string=strings_list())
-            WordCounter().read_in_string(string=145)
+        for test_string in (1, strings_list()):
+            with pytest.raises(AssertionError):
+                WordCounter().read_in_string(string=test_string)
 
-        assert isinstance((WordCounter().read_in_string(string=MANU_STRING)), list)
-        assert isinstance((WordCounter().read_in_string(string=MANU_STRING_2)), list)
+        for test_string in (MANU_STRING, MANU_STRING_2):
+            assert isinstance((WordCounter().read_in_string(string=test_string)), list)
 
 
 class TestLetterCounter:
 
     def test_char_counter_io(self):
 
-        with pytest.raises(AssertionError):
-            LetterCounter()._char_counter(sanitized_text_gen=strings_list(), length=5)
-            LetterCounter()._char_counter(sanitized_text_gen=MANU_STRING, length=5)
+        for test_string in (strings_list(), MANU_STRING):
+            with pytest.raises(AssertionError):
+                LetterCounter()._char_counter(sanitized_text_gen=test_string, length=5)
 
         assert isinstance(LetterCounter()._char_counter(sanitized_text_gen=generator_words_good(), length=5), list)
 
