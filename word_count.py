@@ -11,7 +11,7 @@ class WordCounter:
     from types import GeneratorType
 
     @staticmethod
-    def _char_counter(sanitized_text_gen: GeneratorType, length: int):
+    def _char_counter(genexp_text_sanitized: GeneratorType, length: int):
         """
         Iterate through genexp provided by one of the read_in methods, counting all words passed and cross-checking
         results against the UNIX words file/dictionary and adding those that are to the output list until the list
@@ -23,37 +23,37 @@ class WordCounter:
         from types import GeneratorType
 
         # 230k+ words from the standard UNIX dict in a local text file ('/usr/share/dict/words')
-        english_words = './static/english_words.txt'
+        file_words_eng = './static/english_words.txt'
 
-        assert isinstance(sanitized_text_gen, GeneratorType)
+        assert isinstance(genexp_text_sanitized, GeneratorType)
 
-        with open(english_words, 'rt') as eng_dict:
-            english_dict = list(set([eng_word.lower().rstrip('\n') for eng_word in eng_dict.readlines()]))
+        with open(file_words_eng, 'rt') as file_words_eng:
+            dict_words_english = list(set([eng_word.lower().rstrip('\n') for eng_word in file_words_eng.readlines()]))
 
-        master_word_count = Counter()
+        count_words_master = Counter()
 
-        for w_line in sanitized_text_gen:
-            master_word_count.update(Counter(w_line.split()))
+        for line_working in genexp_text_sanitized:
+            count_words_master.update(Counter(line_working.split()))
 
-        master_word_list = list()
-        most_common_gen = (word for word in master_word_count.most_common() if word[0] in english_dict)
+        list_words_master = list()
+        genexp_words_common_most = (word for word in count_words_master.most_common() if word[0] in dict_words_english)
 
         if length:
-            while len(master_word_list) < length:
+            while len(list_words_master) < length:
                 try:
-                    master_word_list.append(next(most_common_gen))
+                    list_words_master.append(next(genexp_words_common_most))
                 except StopIteration:
                     break
         else:
-            for word in most_common_gen:
-                master_word_list.append(word)
+            for word in genexp_words_common_most:
+                list_words_master.append(word)
 
-        assert isinstance(master_word_list, list)
-        master_word_list.sort(key=lambda counter_obj: counter_obj[1], reverse=True)
-        return master_word_list
+        assert isinstance(list_words_master, list)
+        list_words_master.sort(key=lambda counter_obj: counter_obj[1], reverse=True)
+        return list_words_master
 
     @staticmethod
-    def _sanitize(string_list: (list, tuple)):
+    def _sanitize(list_strings: (list, tuple)):
         """
         Performs additional processing (sanitization) of text. Will strip white space from start and end of string,
         remove special characters, downcase all letters, replace any white space w/single space. Private method
@@ -63,19 +63,19 @@ class WordCounter:
         from types import GeneratorType
         import re
 
-        assert isinstance(string_list, (list, tuple))
+        assert isinstance(list_strings, (list, tuple))
 
         white_space_re = re.compile("\s+")
         special_chars_re = re.compile("[-\"\'|:;.?!,\(\)\d]+")
 
-        trimmed_text = (w_line.strip() for w_line in string_list if w_line)
-        extra_ws_processed_text = (white_space_re.sub(' ', w_line) for w_line in trimmed_text)
-        spec_char_killer_processed_text = (special_chars_re.sub('', w_line) for w_line in extra_ws_processed_text)
-        sanitized_text = (w_line.lower() for w_line in spec_char_killer_processed_text)
+        text_trimmed = (line_working.strip() for line_working in list_strings if line_working)
+        text_no_extra_ws = (white_space_re.sub(' ', line_working) for line_working in text_trimmed)
+        text_no_spec_chars = (special_chars_re.sub('', line_working) for line_working in text_no_extra_ws)
+        text_sanitized = (line_working.lower() for line_working in text_no_spec_chars)
 
-        assert isinstance(sanitized_text, GeneratorType)
-        for sanitized_line in sanitized_text:
-            yield sanitized_line
+        assert isinstance(text_sanitized, GeneratorType)
+        for line_sanitized in text_sanitized:
+            yield line_sanitized
 
     def read_in_file(self, filepath: str, length: int = 10):
         """
@@ -90,7 +90,7 @@ class WordCounter:
             import re
 
             gberg_split_re = re.compile("\n{10}")
-            new_line_re = re.compile("[\n\r]")
+            neline_working_re = re.compile("[\n\r]")
 
             read_text = infile.read()
 
@@ -99,8 +99,8 @@ class WordCounter:
             else:
                 working_text = read_text
 
-            if new_line_re.search(working_text):
-                chunked_text = new_line_re.split(working_text)
+            if neline_working_re.search(working_text):
+                chunked_text = neline_working_re.split(working_text)
             else:
                 chunked_text = [working_text]
 
@@ -116,10 +116,10 @@ class WordCounter:
 
         assert isinstance(string, str)
 
-        new_line_re = re.compile("[\n\r]")
+        neline_working_re = re.compile("[\n\r]")
 
-        if new_line_re.search(string):
-            chunked_text = new_line_re.split(string)
+        if neline_working_re.search(string):
+            chunked_text = neline_working_re.split(string)
         else:
             chunked_text = list(string)
 
@@ -136,20 +136,24 @@ class LetterCounter(WordCounter):
     from types import GeneratorType
 
     @staticmethod
-    def _char_counter(sanitized_text_gen: GeneratorType, length: int):
+    def _char_counter(genexp_text_sanitized: GeneratorType, length: int):
+        """
+        Overridden method from parent class, WordCounter, which counts letters instead of words.
+        """
+
         from collections import Counter
         from types import GeneratorType
         import re
 
-        assert isinstance(sanitized_text_gen, GeneratorType)
+        assert isinstance(genexp_text_sanitized, GeneratorType)
 
         english_ltrs = re.compile("[a-z]")
 
         master_ltr_count = Counter()
 
-        for w_line in sanitized_text_gen:
-            ns_w_line = list(''.join(w_line))
-            master_ltr_count.update(Counter(ns_w_line))
+        for line_working in genexp_text_sanitized:
+            ns_line_working = list(''.join(line_working))
+            master_ltr_count.update(Counter(ns_line_working))
 
         master_ltr_list = list()
         common_ltrs_gen = (ltr for ltr in master_ltr_count.most_common() if english_ltrs.match(ltr[0]))

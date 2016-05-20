@@ -93,18 +93,18 @@ class TestWordCounter:
         from types import GeneratorType
 
         for iterable_obj in (strings_list(), tuple(strings_list())):
-            assert next(WordCounter()._sanitize(string_list=iterable_obj))
-            assert isinstance(WordCounter()._sanitize(string_list=iterable_obj), GeneratorType)
+            assert next(WordCounter()._sanitize(list_strings=iterable_obj))
+            assert isinstance(WordCounter()._sanitize(list_strings=iterable_obj), GeneratorType)
 
         for test_type in (1, 'just a string'):
             with pytest.raises(AssertionError):
-                next(WordCounter()._sanitize(string_list=test_type))
+                next(WordCounter()._sanitize(list_strings=test_type))
 
     def test_sanitizer_sanitizes(self):
 
         spec_chars_re = re.compile("[\d\t\r?|!]")
 
-        for string in WordCounter._sanitize(string_list=strings_list()):
+        for string in WordCounter._sanitize(list_strings=strings_list()):
             assert not spec_chars_re.findall(string)
 
     def test_read_in_file_io(self):
@@ -142,9 +142,9 @@ class TestLetterCounter:
 
         for test_string in (strings_list(), STR_LINE_MULTI):
             with pytest.raises(AssertionError):
-                LetterCounter()._char_counter(sanitized_text_gen=test_string, length=5)
+                LetterCounter()._char_counter(genexp_text_sanitized=test_string, length=5)
 
-        assert isinstance(LetterCounter()._char_counter(sanitized_text_gen=generator_words_good(), length=5), list)
+        assert isinstance(LetterCounter()._char_counter(genexp_text_sanitized=generator_words_good(), length=5), list)
 
     def test_letter_counter_io(self):
 
