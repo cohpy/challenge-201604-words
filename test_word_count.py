@@ -3,17 +3,18 @@
 import pytest
 import re
 
-from word_count import WordCounter, LetterCounter
+from word_count import WordCounter
+from word_count import LetterCounter
 
 
-MANU_STRING = 'This is?\r my |file.\nIt is alright\t 123 I suppose...\nThis is !really! just a test.\nI hope it, works'
-MANU_STRING_2 = 'This is just another string but longer and with no newlines to test the read_in_string method. is is.'
+STR_LINE_MULTI = 'This is?\r my |file.\nIt is alright\t 123 I suppose...\nThis is !really! test.\nI hope it, works'
+STR_LINE_ONE = 'This is just another string but longer and with no newlines to test the read_in_string method. is is.'
 
-FRANKEN_TEXT = './static/pg83.txt'
-FRANKEN_TEXT_ABRIDGED = './static/pg84_super_abridged.txt'
-MOON_TEXT = './static/pg84.txt'
-MANU_TEXT = './static/test.txt'
-MANU_TEXT_2 = './static/one_line_test.txt'
+TEXT_FRANKEN = './static/pg83.txt'
+TEXT_FRANKEN_ABRIDGED = './static/pg84_super_abridged.txt'
+TEXT_MOON = './static/pg84.txt'
+TEXT_LINE_MULTI = './static/test.txt'
+TEXT_LINE_ONE = './static/one_line_test.txt'
 
 
 @pytest.fixture("class")
@@ -32,7 +33,7 @@ def generator_words_dirty():
 @pytest.fixture("class")
 def strings_list():
 
-    return MANU_STRING.split('\n')
+    return STR_LINE_MULTI.split('\n')
 
 
 @pytest.mark.usefixtures("generator_words_good", "generator_words_dirty", "strings_list")
@@ -78,15 +79,15 @@ class TestWordCounter:
     def test_length_matches_returned_word_count(self):
 
         for n_words in (15, 35):
-            assert len(WordCounter().read_in_file(filepath=FRANKEN_TEXT, length=n_words)) == n_words
+            assert len(WordCounter().read_in_file(filepath=TEXT_FRANKEN, length=n_words)) == n_words
 
     def test_return_all_if_length_gt_words_in_text(self):
 
-        assert WordCounter().read_in_file(filepath=MANU_TEXT, length=500)
+        assert WordCounter().read_in_file(filepath=TEXT_LINE_MULTI, length=500)
 
     def test_length_none_returns_all_words(self):
 
-        assert WordCounter().read_in_file(filepath=MANU_TEXT, length=None)
+        assert WordCounter().read_in_file(filepath=TEXT_LINE_MULTI, length=None)
 
     def test_sanitizer_io(self):
         from types import GeneratorType
@@ -114,11 +115,16 @@ class TestWordCounter:
             with pytest.raises(AssertionError):
                 WordCounter().read_in_file(filepath=test_path)
 
-        for test_text in (MANU_TEXT, MANU_TEXT_2):
+        for test_text in (TEXT_LINE_MULTI, TEXT_LINE_ONE):
             assert isinstance(WordCounter().read_in_file(filepath=test_text), list)
 
-        for count_tuple in WordCounter().read_in_file(filepath=FRANKEN_TEXT_ABRIDGED, length=None):
+        for count_tuple in WordCounter().read_in_file(filepath=TEXT_FRANKEN_ABRIDGED, length=None):
             assert not gutenberg_re.findall(count_tuple[0])
+
+    def test_read_in_file_any_gutenbook(self):
+
+        for test_text in (TEXT_FRANKEN, TEXT_MOON):
+            assert WordCounter().read_in_file(test_text, length=5)
 
     def test_read_in_string_io(self):
 
@@ -126,7 +132,7 @@ class TestWordCounter:
             with pytest.raises(AssertionError):
                 WordCounter().read_in_string(string=test_string)
 
-        for test_string in (MANU_STRING, MANU_STRING_2):
+        for test_string in (STR_LINE_MULTI, STR_LINE_ONE):
             assert isinstance((WordCounter().read_in_string(string=test_string)), list)
 
 
@@ -134,7 +140,7 @@ class TestLetterCounter:
 
     def test_char_counter_io(self):
 
-        for test_string in (strings_list(), MANU_STRING):
+        for test_string in (strings_list(), STR_LINE_MULTI):
             with pytest.raises(AssertionError):
                 LetterCounter()._char_counter(sanitized_text_gen=test_string, length=5)
 
@@ -142,23 +148,28 @@ class TestLetterCounter:
 
     def test_letter_counter_io(self):
 
-        assert LetterCounter().read_in_file(filepath=FRANKEN_TEXT_ABRIDGED)
-        assert isinstance(LetterCounter().read_in_file(filepath=FRANKEN_TEXT_ABRIDGED), list)
+        assert LetterCounter().read_in_file(filepath=TEXT_FRANKEN_ABRIDGED)
+        assert isinstance(LetterCounter().read_in_file(filepath=TEXT_FRANKEN_ABRIDGED), list)
 
-        assert LetterCounter().read_in_string(string=MANU_STRING)
-        assert isinstance(LetterCounter().read_in_string(string=MANU_STRING), list)
+        assert LetterCounter().read_in_string(string=STR_LINE_MULTI)
+        assert isinstance(LetterCounter().read_in_string(string=STR_LINE_MULTI), list)
+
+    def test_read_in_file_any_gutenbook(self):
+
+        for test_text in (TEXT_FRANKEN, TEXT_MOON):
+            assert LetterCounter().read_in_file(test_text, length=5)
 
     def test_diff_n_letters(self):
         n_letters_tup = 1, 26
 
         for n_letters in n_letters_tup:
-            letter_count = LetterCounter().read_in_file(filepath=FRANKEN_TEXT, length=n_letters)
+            letter_count = LetterCounter().read_in_file(filepath=TEXT_FRANKEN, length=n_letters)
             assert len(letter_count) == n_letters
 
     def test_all_letters(self):
 
-        assert LetterCounter().read_in_file(filepath=FRANKEN_TEXT_ABRIDGED, length=None)
+        assert LetterCounter().read_in_file(filepath=TEXT_FRANKEN_ABRIDGED, length=None)
 
     def test_counts_letters_only(self):
 
-        assert len(LetterCounter().read_in_file(filepath=FRANKEN_TEXT, length=27)) == 26
+        assert len(LetterCounter().read_in_file(filepath=TEXT_FRANKEN, length=27)) == 26
