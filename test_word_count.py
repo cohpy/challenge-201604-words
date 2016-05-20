@@ -12,6 +12,7 @@ FRANKEN_TEXT = './static/pg83.txt'
 FRANKEN_TEXT_ABRIDGED = './static/pg84_super_abridged.txt'
 MOON_TEXT = './static/pg84.txt'
 MANU_TEXT = './static/test.txt'
+MANU_TEXT_2 = './static/one_line_test.txt'
 
 
 @pytest.fixture("class")
@@ -117,6 +118,7 @@ class TestWordCounter:
             WordCounter().read_in_file(filepath='/Users/cwandrews')
 
         assert isinstance(WordCounter().read_in_file(filepath=MANU_TEXT), list)
+        assert isinstance(WordCounter().read_in_file(filepath=MANU_TEXT_2), list)
 
         for count_tuple in WordCounter().read_in_file(filepath=FRANKEN_TEXT_ABRIDGED, length=None):
             assert not gutenberg_re.findall(count_tuple[0])
@@ -128,6 +130,7 @@ class TestWordCounter:
             WordCounter().read_in_string(string=145)
 
         assert isinstance((WordCounter().read_in_string(string=MANU_STRING)), list)
+        assert isinstance((WordCounter().read_in_string(string=MANU_STRING_2)), list)
 
 
 class TestLetterCounter:
