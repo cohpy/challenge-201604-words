@@ -171,3 +171,25 @@ class LetterCounter(WordCounter):
         master_ltr_list.sort(key=lambda counter_obj: counter_obj[1], reverse=True)
         assert isinstance(master_ltr_list, list)
         return master_ltr_list
+
+
+def frequency_plot(word_counter_obj):
+    import matplotlib.pyplot as plt
+    from collections import OrderedDict
+
+    if len(word_counter_obj) > 30:
+        word_counter_obj = word_counter_obj[:30]
+
+    dict_counted = OrderedDict()
+    for wco in word_counter_obj:
+        dict_counted[wco[0]] = wco[1]
+
+    plt.rcdefaults()
+    plt.barh(range(len(dict_counted)), dict_counted.values(), align='center')
+    plt.tick_params(labelsize='small', pad=2.5)
+    plt.title('Word Frequency')
+    plt.xlabel('Counts')
+    plt.ylabel('Counted')
+    plt.yticks(range(len(dict_counted)), dict_counted.keys(), fontsize=10)
+
+    plt.show()
