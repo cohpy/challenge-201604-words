@@ -1,4 +1,4 @@
-from word_count import WordCounter, frequency_plot
+from text_counter.word_count import WordCounter, frequency_plot
 
 FRANKENSTEIN = './static/pg84.txt'
 

@@ -1,20 +1,21 @@
 # coding = utf-8
 # __author__ = cwandrews
+
 import pytest
 import re
 
-from word_count import WordCounter
-from word_count import LetterCounter
+from text_counter.word_count import WordCounter
+from text_counter.word_count import LetterCounter
 
 
 STR_LINE_MULTI = 'This is?\r my |file.\nIt is alright\t 123 I suppose...\nThis is !really! test.\nI hope it, works'
 STR_LINE_ONE = 'This is just another string but longer and with no newlines to test the read_in_string method. is is.'
 
-TEXT_FRANKEN = './static/pg83.txt'
-TEXT_FRANKEN_ABRIDGED = './static/pg84_super_abridged.txt'
-TEXT_MOON = './static/pg84.txt'
-TEXT_LINE_MULTI = './static/test.txt'
-TEXT_LINE_ONE = './static/one_line_test.txt'
+TEXT_FRANKEN = 'static/pg83.txt'
+TEXT_FRANKEN_ABRIDGED = 'static/pg84_super_abridged.txt'
+TEXT_MOON = 'static/pg84.txt'
+TEXT_LINE_MULTI = 'static/test.txt'
+TEXT_LINE_ONE = 'static/one_line_test.txt'
 
 
 @pytest.fixture("class")

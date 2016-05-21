@@ -23,7 +23,7 @@ class WordCounter:
         from types import GeneratorType
 
         # 230k+ words from the standard UNIX dict in a local text file ('/usr/share/dict/words')
-        file_words_eng = './static/english_words.txt'
+        file_words_eng = 'static/english_words.txt'
 
         assert isinstance(genexp_text_sanitized, GeneratorType)
 
@@ -116,10 +116,10 @@ class WordCounter:
 
         assert isinstance(string, str)
 
-        neline_working_re = re.compile("[\n\r]")
+        newline_working_re = re.compile("[\n\r]")
 
-        if neline_working_re.search(string):
-            chunked_text = neline_working_re.split(string)
+        if newline_working_re.search(string):
+            chunked_text = newline_working_re.split(string)
         else:
             chunked_text = list(string)
 
