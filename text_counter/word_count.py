@@ -174,6 +174,10 @@ class LetterCounter(WordCounter):
 
 
 def frequency_plot(word_counter_obj):
+    """
+    Graph frequency of passed counter objects (WordCounter, LetterCounter).
+    """
+    
     import matplotlib.pyplot as plt
     from collections import OrderedDict
 
