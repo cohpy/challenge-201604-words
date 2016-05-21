@@ -4,3 +4,6 @@
 
 __pycache__/
 /text_counter/.ipynb_checkpoints
+/text_counter/tests/.cache
+/text_counter/tests/.coverage
+/text_counter/.coverage

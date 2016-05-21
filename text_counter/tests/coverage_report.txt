@@ -1,3 +1,8 @@
-Name            Stmts   Miss  Cover   Missing
----------------------------------------------
-word_count.py      91      0   100%   
+Name                       Stmts   Miss  Cover   Missing
+--------------------------------------------------------
+__init__.py                    0      0   100%   
+tests/__init__.py              0      0   100%   
+tests/test_word_count.py     104      0   100%   
+word_count.py                107     15    86%   177-195
+--------------------------------------------------------
+TOTAL                        211     15    93%   
