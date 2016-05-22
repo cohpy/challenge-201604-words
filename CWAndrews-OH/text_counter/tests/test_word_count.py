@@ -1,11 +1,11 @@
 # coding = utf-8
 # __author__ = cwandrews
 
-import pytest
 import re
+import pytest
 
-from text_counter.word_count import WordCounter
 from text_counter.word_count import LetterCounter
+from text_counter.word_count import WordCounter
 
 
 STR_LINE_MULTI = 'This is?\r my |file.\nIt is alright\t 123 I suppose...\nThis is !really! test.\nI hope it, works'

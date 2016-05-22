@@ -3,7 +3,7 @@
 .cache/
 
 __pycache__/
-/text_counter/.ipynb_checkpoints
-/text_counter/tests/.cache
-/text_counter/tests/.coverage
-/text_counter/.coverage
+/CWAndrews-OH/text_counter/.ipynb_checkpoints
+/CWAndrews-OH/text_counter/tests/.cache
+/CWAndrews-OH/text_counter/tests/.coverage
+/CWAndrews-OH/text_counter/.coverage
