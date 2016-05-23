@@ -21,6 +21,7 @@ def UrlFactory ( id ):
         url = "http://www.gutenberg.lib.md.us%s/%s/%s.zip" % ( path, id, id )
     except:
         raise Exception ('BAD ID, PLEASE TRY AN INTEGER VALUE FOR ID...')
+	print ( url )
     return url
 
 def GetBookTxtZip ( zipUrl, localZip ):
@@ -73,7 +74,7 @@ def Test ( results ):
 
 def UploadToS3 ( id, wordFreqList ):
     s3 = boto3.resource('s3')
-    bucket = 'admin-s3-uaa'
+    bucket = 'gutenberg-out'
     key = "%s.json" % ( id )
     body = json.dumps(wordFreqList)
     s3.Object(bucket, key).put(Body=body)
@@ -82,16 +83,18 @@ def CleanUp ( localZip ):
     os.remove(localZip)
 
 def lambda_handler ( event, context ):
-    id = event['id']
-    localZip = "/tmp/%s.zip" % ( id )
-
-    zipUrl = UrlFactory ( id )
-    GetBookTxtZip ( zipUrl, localZip )
-    wordList = WordListFactory ( localZip, id )
-    wordFreqList = WordListToFreqDict( wordList )
-    wordFreqListSorted = SortFreqDict ( wordFreqList )
-    Test ( wordFreqListSorted )
-    UploadToS3 (id, wordFreqList )
-    print wordFreqListSorted
-
-    CleanUp ( localZip )
+	id = event['id']
+	localZip = "/tmp/%s.zip" % ( id )
+	print(id)
+	print(localZip)
+	
+	zipUrl = UrlFactory ( id )
+	GetBookTxtZip ( zipUrl, localZip )
+	wordList = WordListFactory ( localZip, id )
+	wordFreqList = WordListToFreqDict( wordList )
+	wordFreqListSorted = SortFreqDict ( wordFreqList )
+	Test ( wordFreqListSorted )
+	UploadToS3 (id, wordFreqList )
+	
+	print wordFreqListSorted
+	CleanUp ( localZip )
