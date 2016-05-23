@@ -1,0 +1,3 @@
+pip install requests -t /home/ubuntu/requests/
+scp -r -i pemfile.pem ubuntu@123.123.123.123:~/requests requests
+include that in lambda function
