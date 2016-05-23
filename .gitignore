@@ -1,0 +1,9 @@
+.idea/
+.ipynb_checkpoints/
+.cache/
+
+__pycache__/
+/CWAndrews-OH/text_counter/.ipynb_checkpoints
+/CWAndrews-OH/text_counter/tests/.cache
+/CWAndrews-OH/text_counter/tests/.coverage
+/CWAndrews-OH/text_counter/.coverage
